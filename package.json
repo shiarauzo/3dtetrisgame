@@ -11,12 +11,14 @@
   "devDependencies": {
     "@types/bun": "latest",
     "@types/three": "^0.184.0",
+    "@vercel/node": "^5.7.13",
     "vite": "^8.0.10"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.105.0",
     "three": "^0.184.0"
   }
 }
