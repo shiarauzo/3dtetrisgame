@@ -184,7 +184,7 @@ export class UIManager {
       const minutes = Math.floor(seconds / 60);
       const secs = seconds % 60;
 
-      this.elements.pauseTimer.textContent = `Time remaining: ${minutes}:${secs.toString().padStart(2, '0')}`;
+      this.elements.pauseTimer.textContent = `Time remaining: ${minutes}:${secs.toString().padStart(2, '0')}…`;
 
       if (remaining === 0) {
         this.stopPauseTimer();

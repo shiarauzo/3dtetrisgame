@@ -35,6 +35,18 @@
       display: none !important;
     }
 
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
     /* Landing */
     #landing {
       text-align: center;
@@ -62,6 +74,11 @@
       background: #FFD700;
       color: #000;
       border: 3px solid #000;
+    }
+
+    #landing button:focus-visible {
+      outline: 3px solid #000;
+      outline-offset: 2px;
     }
 
     #ranking-preview {
@@ -148,6 +165,11 @@
       background: #333;
     }
 
+    #help-button:focus-visible {
+      outline: 3px solid #000;
+      outline-offset: 2px;
+    }
+
     /* Help Panel */
     #help-panel {
       position: fixed;
@@ -159,6 +181,7 @@
       padding: 2rem;
       max-width: 500px;
       z-index: 1000;
+      overscroll-behavior: contain;
     }
 
     #help-panel h2 {
@@ -184,6 +207,11 @@
       font-weight: 700;
     }
 
+    #help-panel button:focus-visible {
+      outline: 3px solid #FFD700;
+      outline-offset: 2px;
+    }
+
     /* Pause Overlay */
     #pause-overlay {
       position: fixed;
@@ -197,6 +225,7 @@
       justify-content: center;
       align-items: center;
       z-index: 999;
+      overscroll-behavior: contain;
     }
 
     #pause-overlay h2 {
@@ -220,6 +249,11 @@
       cursor: pointer;
       font-size: 1.2rem;
       font-weight: 700;
+    }
+
+    #pause-overlay button:focus-visible {
+      outline: 3px solid #FFD700;
+      outline-offset: 2px;
     }
 
     /* Game Over */
@@ -261,6 +295,16 @@
       background: #333;
     }
 
+    #game-over button:focus-visible {
+      outline: 3px solid #000;
+      outline-offset: 2px;
+    }
+
+    #game-over input:focus-visible {
+      outline: 3px solid #000;
+      outline-offset: 2px;
+    }
+
     /* Ranking View */
     #ranking-view {
       max-width: 800px;
@@ -291,6 +335,11 @@
       color: #FFD700;
     }
 
+    .filter-tabs button:focus-visible {
+      outline: 3px solid #000;
+      outline-offset: 2px;
+    }
+
     #ranking-list {
       background: rgba(0, 0, 0, 0.1);
       padding: 1rem;
@@ -306,6 +355,25 @@
       padding: 1rem 2rem;
       cursor: pointer;
       font-weight: 700;
+    }
+
+    #back-button:focus-visible {
+      outline: 3px solid #000;
+      outline-offset: 2px;
+    }
+
+    /* Canvas touch optimization */
+    #game-canvas {
+      touch-action: manipulation;
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
     }
   </style>
 </head>
@@ -326,13 +394,13 @@
       <div id="left-panel">
         <div class="panel-section">
           <h3>Next Piece</h3>
-          <canvas id="next-piece-canvas"></canvas>
+          <canvas id="next-piece-canvas" width="150" height="150" aria-label="Next piece preview"></canvas>
         </div>
       </div>
 
       <div id="game-canvas-container">
-        <canvas id="game-canvas"></canvas>
-        <button id="help-button">?</button>
+        <canvas id="game-canvas" width="800" height="600" aria-label="3D Tetris game"></canvas>
+        <button id="help-button" aria-label="Show controls help">?</button>
       </div>
 
       <div id="right-panel">
@@ -385,7 +453,8 @@
       <h2>Game Over</h2>
       <p id="final-score">Score: 0</p>
       <p id="rank-position"></p>
-      <input type="text" id="nickname-input" placeholder="Enter nickname" maxlength="20">
+      <label for="nickname-input" class="visually-hidden">Nickname</label>
+      <input type="text" id="nickname-input" placeholder="Enter nickname" maxlength="20" autocomplete="nickname" aria-label="Enter your nickname for the leaderboard">
       <div>
         <button id="submit-score">Submit Score</button>
         <button id="play-again">Play Again</button>

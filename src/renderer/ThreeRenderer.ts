@@ -23,8 +23,12 @@ export class ThreeRenderer {
   private nextPieceScene: THREE.Scene;
   private nextPieceCamera: THREE.OrthographicCamera;
   private flashPlanes: THREE.Mesh[] = [];
+  private prefersReducedMotion: boolean;
 
   constructor(canvas: HTMLCanvasElement, nextPieceCanvas: HTMLCanvasElement) {
+    // Check for reduced motion preference
+    this.prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     // Main scene setup
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(BG_COLOR);
@@ -174,6 +178,9 @@ export class ThreeRenderer {
   }
 
   public showFlashEffect(yLevel: number): void {
+    // Skip animation if user prefers reduced motion
+    if (this.prefersReducedMotion) return;
+
     const geometry = new THREE.PlaneGeometry(GRID_WIDTH, GRID_DEPTH);
     const material = new THREE.MeshBasicMaterial({ color: FLASH_COLOR, transparent: true, opacity: 0.7 });
     const plane = new THREE.Mesh(geometry, material);
