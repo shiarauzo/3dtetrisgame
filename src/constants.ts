@@ -4,10 +4,10 @@ export const GRID_DEPTH = 5;
 export const GRID_HEIGHT = 15;
 
 // Colors
-export const BG_COLOR = 0xFFD700; // Yellow
-export const BLOCK_COLOR = 0x000000; // Black
-export const EDGE_COLOR = 0xFFD700; // Yellow
-export const GRID_LINE_COLOR = 0x333333;
+export const BG_COLOR = 0xF5F0E6; // Cream
+export const BLOCK_COLOR = 0x1a1a1a; // Near black
+export const EDGE_COLOR = 0xF5F0E6; // Cream (matching background)
+export const GRID_LINE_COLOR = 0xCCC5B8; // Subtle gray
 export const FLASH_COLOR = 0xFFFFFF; // White
 
 // Game settings

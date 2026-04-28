@@ -3,12 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Stakk - 3D Tetris Game</title>
-  <meta name="description" content="Play Stakk - A minimal 3D Tetris game with isometric aesthetics and global rankings. No login required.">
-  <meta name="keywords" content="tetris, 3d tetris, puzzle game, browser game, web game">
-  <meta property="og:title" content="Stakk - 3D Tetris">
-  <meta property="og:description" content="A minimal 3D Tetris game with isometric aesthetics and global rankings.">
-  <meta property="og:type" content="website">
+  <title>Stakk</title>
+  <meta name="description" content="Stakk - A minimal 3D Tetris game">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <style>
     * {
@@ -18,22 +14,13 @@
     }
 
     body {
-      background-color: #FFD700;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: #F5F0E6;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
       overflow: hidden;
+      color: #1a1a1a;
     }
 
-    #app {
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .hidden {
-      display: none !important;
-    }
+    .hidden { display: none !important; }
 
     .visually-hidden {
       position: absolute;
@@ -47,128 +34,105 @@
       border: 0;
     }
 
-    /* Landing */
-    #landing {
-      text-align: center;
-    }
-
-    #landing h1 {
-      font-size: 4rem;
-      font-weight: 900;
-      color: #000;
-      margin-bottom: 2rem;
-    }
-
-    #landing button {
-      font-size: 1.5rem;
-      padding: 1rem 2rem;
-      background: #000;
-      color: #FFD700;
-      border: 3px solid #000;
-      cursor: pointer;
-      font-weight: 700;
-      margin-bottom: 2rem;
-    }
-
-    #landing button:hover {
-      background: #FFD700;
-      color: #000;
-      border: 3px solid #000;
-    }
-
-    #landing button:focus-visible {
-      outline: 3px solid #000;
-      outline-offset: 2px;
-    }
-
-    #ranking-preview {
-      max-width: 400px;
-      margin: 0 auto;
-      background: rgba(0, 0, 0, 0.1);
-      padding: 1rem;
-    }
-
-    #ranking-preview h3 {
-      margin-bottom: 1rem;
-    }
-
-    .ranking-entry {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.5rem;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-    }
-
-    /* Game View */
+    /* Game View - Full screen canvas */
     #game-view {
       width: 100vw;
       height: 100vh;
-      display: grid;
-      grid-template-columns: 200px 1fr 200px;
-      gap: 1rem;
-      padding: 1rem;
-    }
-
-    #left-panel, #right-panel {
-      background: rgba(0, 0, 0, 0.1);
-      padding: 1rem;
-    }
-
-    .panel-section {
-      margin-bottom: 2rem;
-    }
-
-    .panel-section h3 {
-      margin-bottom: 1rem;
-      font-size: 1.2rem;
-    }
-
-    #next-piece-canvas {
-      width: 150px;
-      height: 150px;
-      background: rgba(0, 0, 0, 0.05);
-    }
-
-    #score, #level, #combo {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #000;
-    }
-
-    #game-canvas-container {
       position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
     }
 
     #game-canvas {
       display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: manipulation;
     }
 
-    #help-button {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #000;
-      color: #FFD700;
-      border: none;
+    /* Minimal UI overlay */
+    .ui-overlay {
+      position: fixed;
+      pointer-events: none;
+    }
+
+    .ui-overlay > * {
+      pointer-events: auto;
+    }
+
+    /* Top left - Next piece */
+    #next-piece-container {
+      position: fixed;
+      top: 2rem;
+      left: 2rem;
+    }
+
+    #next-piece-container span {
+      display: block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.5;
+      margin-bottom: 0.5rem;
+    }
+
+    #next-piece-canvas {
+      background: transparent;
+    }
+
+    /* Top right - Stats */
+    #stats-container {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      text-align: right;
+    }
+
+    .stat {
+      margin-bottom: 1rem;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.5;
+    }
+
+    .stat-value {
       font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    /* Bottom - Controls hint */
+    #controls-hint {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      opacity: 0.4;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* Help button */
+    #help-button {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: transparent;
+      color: #1a1a1a;
+      border: 1px solid rgba(26, 26, 26, 0.2);
+      font-size: 0.9rem;
       cursor: pointer;
-      font-weight: 700;
+      opacity: 0.5;
+      transition: opacity 0.2s;
     }
 
-    #help-button:hover {
-      background: #333;
-    }
-
-    #help-button:focus-visible {
-      outline: 3px solid #000;
-      outline-offset: 2px;
-    }
+    #help-button:hover { opacity: 1; }
+    #help-button:focus-visible { outline: 2px solid #1a1a1a; outline-offset: 2px; }
 
     /* Help Panel */
     #help-panel {
@@ -176,41 +140,51 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: #000;
-      color: #FFD700;
+      background: #1a1a1a;
+      color: #F5F0E6;
       padding: 2rem;
-      max-width: 500px;
       z-index: 1000;
+      min-width: 300px;
       overscroll-behavior: contain;
     }
 
     #help-panel h2 {
-      margin-bottom: 1rem;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1.5rem;
+      font-weight: 400;
     }
 
     #help-panel table {
       width: 100%;
-      margin-bottom: 1rem;
+      border-collapse: collapse;
     }
 
     #help-panel td {
-      padding: 0.5rem;
-      border-bottom: 1px solid #FFD700;
+      padding: 0.4rem 0;
+      font-size: 0.85rem;
+    }
+
+    #help-panel td:last-child {
+      text-align: right;
+      opacity: 0.6;
     }
 
     #help-panel button {
-      background: #FFD700;
-      color: #000;
-      border: none;
+      margin-top: 1.5rem;
+      background: transparent;
+      color: #F5F0E6;
+      border: 1px solid rgba(245, 240, 230, 0.3);
       padding: 0.5rem 1rem;
       cursor: pointer;
-      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
     }
 
-    #help-panel button:focus-visible {
-      outline: 3px solid #FFD700;
-      outline-offset: 2px;
-    }
+    #help-panel button:hover { border-color: #F5F0E6; }
+    #help-panel button:focus-visible { outline: 2px solid #F5F0E6; outline-offset: 2px; }
 
     /* Pause Overlay */
     #pause-overlay {
@@ -219,7 +193,7 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.9);
+      background: rgba(26, 26, 26, 0.95);
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -229,143 +203,187 @@
     }
 
     #pause-overlay h2 {
-      color: #FFD700;
-      font-size: 3rem;
+      color: #F5F0E6;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      font-weight: 400;
       margin-bottom: 1rem;
     }
 
     #pause-timer {
-      color: #FFD700;
-      font-size: 1.5rem;
+      color: #F5F0E6;
+      opacity: 0.5;
+      font-size: 0.8rem;
       margin-bottom: 2rem;
     }
 
     #pause-overlay button {
-      background: #FFD700;
-      color: #000;
-      border: none;
-      padding: 1rem 2rem;
-      margin: 0.5rem;
+      background: transparent;
+      color: #F5F0E6;
+      border: 1px solid rgba(245, 240, 230, 0.3);
+      padding: 0.75rem 2rem;
+      margin: 0.25rem;
       cursor: pointer;
-      font-size: 1.2rem;
-      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
     }
 
-    #pause-overlay button:focus-visible {
-      outline: 3px solid #FFD700;
-      outline-offset: 2px;
-    }
+    #pause-overlay button:hover { border-color: #F5F0E6; }
+    #pause-overlay button:focus-visible { outline: 2px solid #F5F0E6; outline-offset: 2px; }
 
     /* Game Over */
     #game-over {
-      text-align: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #F5F0E6;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
     }
 
     #game-over h2 {
-      font-size: 3rem;
-      margin-bottom: 1rem;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      font-weight: 400;
+      margin-bottom: 2rem;
+      opacity: 0.5;
     }
 
-    #game-over p {
-      font-size: 1.5rem;
+    #final-score {
+      font-size: 3rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    #rank-position {
+      font-size: 0.9rem;
+      opacity: 0.5;
       margin-bottom: 2rem;
     }
 
     #game-over input {
-      font-size: 1.2rem;
-      padding: 0.5rem 1rem;
-      margin-bottom: 1rem;
-      border: 2px solid #000;
-      background: #fff;
-      width: 300px;
+      font-family: inherit;
+      font-size: 1rem;
+      padding: 0.75rem 1rem;
+      border: 1px solid rgba(26, 26, 26, 0.2);
+      background: transparent;
+      text-align: center;
+      width: 200px;
+      margin-bottom: 1.5rem;
+    }
+
+    #game-over input:focus {
+      outline: none;
+      border-color: #1a1a1a;
+    }
+
+    #game-over .buttons {
+      display: flex;
+      gap: 0.5rem;
     }
 
     #game-over button {
-      background: #000;
-      color: #FFD700;
-      border: none;
-      padding: 1rem 2rem;
-      margin: 0.5rem;
+      background: transparent;
+      color: #1a1a1a;
+      border: 1px solid rgba(26, 26, 26, 0.2);
+      padding: 0.75rem 1.5rem;
       cursor: pointer;
-      font-size: 1.2rem;
-      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
     }
 
-    #game-over button:hover {
-      background: #333;
-    }
-
-    #game-over button:focus-visible {
-      outline: 3px solid #000;
-      outline-offset: 2px;
-    }
-
-    #game-over input:focus-visible {
-      outline: 3px solid #000;
-      outline-offset: 2px;
-    }
+    #game-over button:hover { border-color: #1a1a1a; }
+    #game-over button:focus-visible { outline: 2px solid #1a1a1a; outline-offset: 2px; }
 
     /* Ranking View */
     #ranking-view {
-      max-width: 800px;
-      margin: 0 auto;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #F5F0E6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3rem;
+      z-index: 1000;
+      overflow-y: auto;
     }
 
     #ranking-view h2 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      font-weight: 400;
+      margin-bottom: 2rem;
+      opacity: 0.5;
     }
 
     .filter-tabs {
       display: flex;
-      gap: 1rem;
-      margin-bottom: 1rem;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
     }
 
     .filter-tabs button {
-      background: rgba(0, 0, 0, 0.1);
-      border: 2px solid #000;
+      background: transparent;
+      border: 1px solid rgba(26, 26, 26, 0.2);
       padding: 0.5rem 1rem;
       cursor: pointer;
-      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
     }
 
     .filter-tabs button.active {
-      background: #000;
-      color: #FFD700;
+      background: #1a1a1a;
+      color: #F5F0E6;
+      border-color: #1a1a1a;
     }
 
-    .filter-tabs button:focus-visible {
-      outline: 3px solid #000;
-      outline-offset: 2px;
-    }
+    .filter-tabs button:focus-visible { outline: 2px solid #1a1a1a; outline-offset: 2px; }
 
     #ranking-list {
-      background: rgba(0, 0, 0, 0.1);
-      padding: 1rem;
-      max-height: 60vh;
-      overflow-y: auto;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .ranking-entry {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(26, 26, 26, 0.1);
+      font-size: 0.9rem;
+    }
+
+    .ranking-entry span:last-child {
+      font-weight: 600;
     }
 
     #back-button {
-      margin-top: 1rem;
-      background: #000;
-      color: #FFD700;
-      border: none;
-      padding: 1rem 2rem;
+      margin-top: 2rem;
+      background: transparent;
+      color: #1a1a1a;
+      border: 1px solid rgba(26, 26, 26, 0.2);
+      padding: 0.75rem 2rem;
       cursor: pointer;
-      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
     }
 
-    #back-button:focus-visible {
-      outline: 3px solid #000;
-      outline-offset: 2px;
-    }
-
-    /* Canvas touch optimization */
-    #game-canvas {
-      touch-action: manipulation;
-    }
+    #back-button:hover { border-color: #1a1a1a; }
+    #back-button:focus-visible { outline: 2px solid #1a1a1a; outline-offset: 2px; }
 
     /* Reduced motion */
     @media (prefers-reduced-motion: reduce) {
@@ -378,101 +396,86 @@
   </style>
 </head>
 <body>
-  <div id="app">
-    <!-- Landing Page -->
-    <div id="landing">
-      <h1>STAKK</h1>
-      <button id="play-button">Click to play</button>
-      <div id="ranking-preview">
-        <h3>Top 5</h3>
-        <div id="top-5-list"></div>
+  <!-- Game View (starts immediately) -->
+  <div id="game-view">
+    <canvas id="game-canvas" aria-label="3D Tetris game"></canvas>
+
+    <!-- Next piece -->
+    <div id="next-piece-container">
+      <span>Next</span>
+      <canvas id="next-piece-canvas" width="100" height="100" aria-label="Next piece preview"></canvas>
+    </div>
+
+    <!-- Stats -->
+    <div id="stats-container">
+      <div class="stat">
+        <div class="stat-label">Score</div>
+        <div class="stat-value" id="score">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Level</div>
+        <div class="stat-value" id="level">1</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Combo</div>
+        <div class="stat-value" id="combo">0</div>
       </div>
     </div>
 
-    <!-- Game View -->
-    <div id="game-view" class="hidden">
-      <div id="left-panel">
-        <div class="panel-section">
-          <h3>Next Piece</h3>
-          <canvas id="next-piece-canvas" width="150" height="150" aria-label="Next piece preview"></canvas>
-        </div>
-      </div>
+    <!-- Controls hint -->
+    <div id="controls-hint">Arrows · Q/E R/F · Space · Mouse</div>
 
-      <div id="game-canvas-container">
-        <canvas id="game-canvas" width="800" height="600" aria-label="3D Tetris game"></canvas>
-        <button id="help-button" aria-label="Show controls help">?</button>
-      </div>
+    <!-- Help button -->
+    <button id="help-button" aria-label="Show controls help">?</button>
+  </div>
 
-      <div id="right-panel">
-        <div class="panel-section">
-          <h3>Score</h3>
-          <div id="score">0</div>
-        </div>
-        <div class="panel-section">
-          <h3>Level</h3>
-          <div id="level">1</div>
-        </div>
-        <div class="panel-section">
-          <h3>Combo</h3>
-          <div id="combo">0</div>
-        </div>
-        <div class="panel-section">
-          <h3>Top 5</h3>
-          <div id="game-top-5"></div>
-        </div>
-      </div>
+  <!-- Help Panel -->
+  <div id="help-panel" class="hidden">
+    <h2>Controls</h2>
+    <table>
+      <tr><td>Move</td><td>Arrow keys</td></tr>
+      <tr><td>Rotate H</td><td>Q / E</td></tr>
+      <tr><td>Rotate V</td><td>R / F</td></tr>
+      <tr><td>Drop</td><td>Space</td></tr>
+      <tr><td>Camera</td><td>Mouse drag</td></tr>
+      <tr><td>Snap</td><td>X / Y / Z</td></tr>
+      <tr><td>Pause</td><td>Esc</td></tr>
+    </table>
+    <button id="close-help">Close</button>
+  </div>
+
+  <!-- Pause Overlay -->
+  <div id="pause-overlay" class="hidden">
+    <h2>Paused</h2>
+    <div id="pause-timer"></div>
+    <button id="continue-button">Continue</button>
+    <button id="exit-button">Restart</button>
+  </div>
+
+  <!-- Game Over -->
+  <div id="game-over" class="hidden">
+    <h2>Game Over</h2>
+    <div id="final-score">0</div>
+    <div id="rank-position"></div>
+    <label for="nickname-input" class="visually-hidden">Nickname</label>
+    <input type="text" id="nickname-input" placeholder="Your name" maxlength="20" autocomplete="nickname" aria-label="Enter your nickname">
+    <div class="buttons">
+      <button id="submit-score">Submit</button>
+      <button id="play-again">Play Again</button>
+      <button id="view-ranking">Rankings</button>
     </div>
+  </div>
 
-    <!-- Help Panel -->
-    <div id="help-panel" class="hidden">
-      <h2>Controls</h2>
-      <table>
-        <tr><td>Move piece</td><td>Arrow keys</td></tr>
-        <tr><td>Rotate horizontal</td><td>Q / E</td></tr>
-        <tr><td>Rotate vertical</td><td>R / F</td></tr>
-        <tr><td>Hard drop</td><td>Space</td></tr>
-        <tr><td>Rotate camera</td><td>Mouse drag</td></tr>
-        <tr><td>Snap camera X</td><td>X</td></tr>
-        <tr><td>Snap camera Y</td><td>Y</td></tr>
-        <tr><td>Snap camera Z</td><td>Z</td></tr>
-        <tr><td>Pause</td><td>ESC</td></tr>
-      </table>
-      <button id="close-help">Close</button>
+  <!-- Ranking View -->
+  <div id="ranking-view" class="hidden">
+    <h2>Rankings</h2>
+    <div class="filter-tabs">
+      <button class="filter-tab active" data-filter="global">All Time</button>
+      <button class="filter-tab" data-filter="daily">Today</button>
+      <button class="filter-tab" data-filter="weekly">Week</button>
     </div>
-
-    <!-- Pause Overlay -->
-    <div id="pause-overlay" class="hidden">
-      <h2>Paused</h2>
-      <div id="pause-timer"></div>
-      <button id="continue-button">Continue</button>
-      <button id="exit-button">Exit</button>
-    </div>
-
-    <!-- Game Over -->
-    <div id="game-over" class="hidden">
-      <h2>Game Over</h2>
-      <p id="final-score">Score: 0</p>
-      <p id="rank-position"></p>
-      <label for="nickname-input" class="visually-hidden">Nickname</label>
-      <input type="text" id="nickname-input" placeholder="Enter nickname" maxlength="20" autocomplete="nickname" aria-label="Enter your nickname for the leaderboard">
-      <div>
-        <button id="submit-score">Submit Score</button>
-        <button id="play-again">Play Again</button>
-        <button id="view-ranking">View Ranking</button>
-      </div>
-    </div>
-
-    <!-- Ranking View -->
-    <div id="ranking-view" class="hidden">
-      <h2>Rankings</h2>
-      <div class="filter-tabs">
-        <button class="filter-tab active" data-filter="global">Global</button>
-        <button class="filter-tab" data-filter="daily">Daily</button>
-        <button class="filter-tab" data-filter="weekly">Weekly</button>
-      </div>
-      <div id="ranking-list"></div>
-      <button id="back-button">Back to Menu</button>
-    </div>
+    <div id="ranking-list"></div>
+    <button id="back-button">Back</button>
   </div>
 
   <script type="module" src="/src/main.ts"></script>

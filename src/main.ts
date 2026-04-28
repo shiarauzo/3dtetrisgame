@@ -13,22 +13,20 @@ class Game {
   private apiClient: APIClient;
   private animationFrameId: number | null = null;
   private lastTime = 0;
+  private canvas: HTMLCanvasElement;
 
   constructor() {
     // Get canvas elements
-    const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
+    this.canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
     const nextPieceCanvas = document.getElementById('next-piece-canvas') as HTMLCanvasElement;
 
-    // Set canvas sizes
-    canvas.width = 800;
-    canvas.height = 600;
-    nextPieceCanvas.width = 150;
-    nextPieceCanvas.height = 150;
+    // Set canvas to fullscreen
+    this.resizeCanvas();
 
     // Initialize systems
     this.engine = new GameEngine();
-    this.renderer = new ThreeRenderer(canvas, nextPieceCanvas);
-    this.inputHandler = new InputHandler(this.engine, this.renderer, canvas);
+    this.renderer = new ThreeRenderer(this.canvas, nextPieceCanvas);
+    this.inputHandler = new InputHandler(this.engine, this.renderer, this.canvas);
     this.uiManager = new UIManager();
     this.apiClient = new APIClient();
 
@@ -38,45 +36,38 @@ class Game {
     // Setup input callbacks
     this.inputHandler.onPause(() => this.handlePause());
 
-    // Show landing page and load top rankings
-    this.showLanding();
-
     // Handle window resize
     window.addEventListener('resize', () => this.handleResize());
+
+    // Start game immediately
+    this.startGame();
   }
 
   private setupUICallbacks(): void {
-    this.uiManager.onPlayClick(() => this.startGame());
     this.uiManager.onContinue(() => this.resumeGame());
-    this.uiManager.onExit(() => this.exitToMenu());
+    this.uiManager.onExit(() => this.restartGame());
     this.uiManager.onPlayAgain(() => this.startGame());
     this.uiManager.onSubmitScore((nickname) => this.submitScore(nickname));
     this.uiManager.onViewRanking((filter) => this.viewRanking(filter));
-    this.uiManager.onBackToMenu(() => this.showLanding());
-  }
-
-  private async showLanding(): Promise<void> {
-    this.uiManager.showLanding();
-    this.stopGameLoop();
-
-    // Load top rankings
-    const topRankings = await this.apiClient.getTopRankings(5);
-    this.uiManager.updateRankingPreview(topRankings);
+    this.uiManager.onBackToMenu(() => this.startGame());
   }
 
   private startGame(): void {
     this.engine.reset();
     this.uiManager.showGame();
     this.startGameLoop();
+  }
 
-    // Load top rankings for sidebar
-    this.apiClient.getTopRankings(5).then((rankings) => {
-      this.uiManager.updateRankingPreview(rankings);
-    });
+  private restartGame(): void {
+    this.engine.setPause(false);
+    this.uiManager.hidePause();
+    this.startGame();
   }
 
   private handlePause(): void {
     const state = this.engine.getState();
+    if (state.isGameOver) return;
+
     if (state.isPaused) {
       this.resumeGame();
     } else {
@@ -90,11 +81,6 @@ class Game {
     this.uiManager.hidePause();
   }
 
-  private exitToMenu(): void {
-    this.engine.setPause(false);
-    this.showLanding();
-  }
-
   private async submitScore(nickname: string): Promise<void> {
     const state = this.engine.getState();
     await this.apiClient.submitScore(nickname, state.score);
@@ -102,7 +88,7 @@ class Game {
     // Calculate rank position
     const rankings = await this.apiClient.getRankings('global');
     const position = rankings.findIndex((r) => r.score === state.score && r.nickname === nickname) + 1;
-    this.uiManager.showRankPosition(position);
+    this.uiManager.showRankPosition(position || rankings.length + 1);
   }
 
   private async viewRanking(filter: RankingFilter): Promise<void> {
@@ -156,16 +142,14 @@ class Game {
     }
   }
 
+  private resizeCanvas(): void {
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+  }
+
   private handleResize(): void {
-    const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
-    const container = document.getElementById('game-canvas-container');
-    if (container) {
-      const width = Math.min(800, container.clientWidth - 40);
-      const height = Math.min(600, container.clientHeight - 40);
-      canvas.width = width;
-      canvas.height = height;
-      this.renderer.handleResize(width, height);
-    }
+    this.resizeCanvas();
+    this.renderer.handleResize(this.canvas.width, this.canvas.height);
   }
 }
 

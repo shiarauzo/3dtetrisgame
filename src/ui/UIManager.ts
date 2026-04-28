@@ -3,13 +3,11 @@ import { MAX_PAUSE_TIME } from '../constants';
 
 export class UIManager {
   private elements = {
-    landing: document.getElementById('landing')!,
     gameView: document.getElementById('game-view')!,
     helpPanel: document.getElementById('help-panel')!,
     pauseOverlay: document.getElementById('pause-overlay')!,
     gameOver: document.getElementById('game-over')!,
     rankingView: document.getElementById('ranking-view')!,
-    playButton: document.getElementById('play-button')!,
     helpButton: document.getElementById('help-button')!,
     closeHelp: document.getElementById('close-help')!,
     continueButton: document.getElementById('continue-button')!,
@@ -25,13 +23,10 @@ export class UIManager {
     rankPosition: document.getElementById('rank-position')!,
     nicknameInput: document.getElementById('nickname-input') as HTMLInputElement,
     pauseTimer: document.getElementById('pause-timer')!,
-    top5List: document.getElementById('top-5-list')!,
-    gameTop5: document.getElementById('game-top-5')!,
     rankingList: document.getElementById('ranking-list')!,
   };
 
   private callbacks = {
-    onPlayClick: null as (() => void) | null,
     onContinue: null as (() => void) | null,
     onExit: null as (() => void) | null,
     onSubmitScore: null as ((nickname: string) => void) | null,
@@ -48,10 +43,6 @@ export class UIManager {
   }
 
   private setupEventListeners(): void {
-    this.elements.playButton.addEventListener('click', () => {
-      if (this.callbacks.onPlayClick) this.callbacks.onPlayClick();
-    });
-
     this.elements.helpButton.addEventListener('click', () => {
       this.toggleHelp();
     });
@@ -96,11 +87,16 @@ export class UIManager {
         if (this.callbacks.onViewRanking) this.callbacks.onViewRanking(filter);
       });
     });
-  }
 
-  public showLanding(): void {
-    this.hideAll();
-    this.elements.landing.classList.remove('hidden');
+    // Enter key submits score
+    this.elements.nicknameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const nickname = this.elements.nicknameInput.value.trim();
+        if (nickname && this.callbacks.onSubmitScore) {
+          this.callbacks.onSubmitScore(nickname);
+        }
+      }
+    });
   }
 
   public showGame(): void {
@@ -120,10 +116,11 @@ export class UIManager {
   }
 
   public showGameOver(score: number): void {
-    this.hideAll();
     this.elements.gameOver.classList.remove('hidden');
-    this.elements.finalScore.textContent = `Score: ${score}`;
+    this.elements.finalScore.textContent = score.toLocaleString();
+    this.elements.rankPosition.textContent = '';
     this.elements.nicknameInput.value = '';
+    this.elements.nicknameInput.focus();
   }
 
   public showRanking(): void {
@@ -136,8 +133,6 @@ export class UIManager {
   }
 
   private hideAll(): void {
-    this.elements.landing.classList.add('hidden');
-    this.elements.gameView.classList.add('hidden');
     this.elements.gameOver.classList.add('hidden');
     this.elements.rankingView.classList.add('hidden');
     this.elements.helpPanel.classList.add('hidden');
@@ -145,14 +140,9 @@ export class UIManager {
   }
 
   public updateGameStats(state: GameState): void {
-    this.elements.score.textContent = state.score.toString();
+    this.elements.score.textContent = state.score.toLocaleString();
     this.elements.level.textContent = state.level.toString();
     this.elements.combo.textContent = state.combo.toString();
-  }
-
-  public updateRankingPreview(rankings: RankingEntry[]): void {
-    this.renderRankingList(rankings.slice(0, 5), this.elements.top5List);
-    this.renderRankingList(rankings.slice(0, 5), this.elements.gameTop5);
   }
 
   public updateFullRanking(rankings: RankingEntry[]): void {
@@ -160,12 +150,16 @@ export class UIManager {
   }
 
   private renderRankingList(rankings: RankingEntry[], container: HTMLElement): void {
+    if (rankings.length === 0) {
+      container.innerHTML = '<div class="ranking-entry"><span>No scores yet</span><span>—</span></div>';
+      return;
+    }
     container.innerHTML = rankings
       .map(
         (entry, index) => `
       <div class="ranking-entry">
         <span>${index + 1}. ${entry.nickname}</span>
-        <span>${entry.score}</span>
+        <span>${entry.score.toLocaleString()}</span>
       </div>
     `
       )
@@ -173,7 +167,7 @@ export class UIManager {
   }
 
   public showRankPosition(position: number): void {
-    this.elements.rankPosition.textContent = `Rank: #${position}`;
+    this.elements.rankPosition.textContent = `#${position}`;
   }
 
   private startPauseTimer(): void {
@@ -184,7 +178,7 @@ export class UIManager {
       const minutes = Math.floor(seconds / 60);
       const secs = seconds % 60;
 
-      this.elements.pauseTimer.textContent = `Time remaining: ${minutes}:${secs.toString().padStart(2, '0')}…`;
+      this.elements.pauseTimer.textContent = `${minutes}:${secs.toString().padStart(2, '0')}`;
 
       if (remaining === 0) {
         this.stopPauseTimer();
@@ -201,10 +195,6 @@ export class UIManager {
   }
 
   // Callback setters
-  public onPlayClick(callback: () => void): void {
-    this.callbacks.onPlayClick = callback;
-  }
-
   public onContinue(callback: () => void): void {
     this.callbacks.onContinue = callback;
   }
