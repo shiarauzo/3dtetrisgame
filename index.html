@@ -6,6 +6,9 @@
   <title>Stakk</title>
   <meta name="description" content="Stakk - A minimal 3D Tetris game">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -15,7 +18,7 @@
 
     body {
       background-color: #F5F0E6;
-      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-family: 'Press Start 2P', monospace;
       overflow: hidden;
       color: #1a1a1a;
     }
@@ -61,74 +64,109 @@
     /* Top left - Next piece */
     #next-piece-container {
       position: fixed;
-      top: 2rem;
-      left: 2rem;
+      top: 1.5rem;
+      left: 1.5rem;
+      background: rgba(245, 240, 230, 0.95);
+      padding: 1rem;
+      z-index: 10;
     }
 
     #next-piece-container span {
       display: block;
-      font-size: 0.7rem;
+      font-size: 0.5rem;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      opacity: 0.5;
-      margin-bottom: 0.5rem;
+      letter-spacing: 0.15em;
+      opacity: 0.6;
+      margin-bottom: 0.75rem;
     }
 
     #next-piece-canvas {
       background: transparent;
+      display: block;
     }
 
     /* Top right - Stats */
     #stats-container {
       position: fixed;
-      top: 2rem;
-      right: 2rem;
+      top: 1.5rem;
+      right: 1.5rem;
       text-align: right;
+      background: rgba(245, 240, 230, 0.95);
+      padding: 1rem;
+      z-index: 10;
     }
 
     .stat {
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .stat:last-child {
+      margin-bottom: 0;
     }
 
     .stat-label {
-      font-size: 0.7rem;
+      font-size: 0.4rem;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      opacity: 0.5;
+      letter-spacing: 0.15em;
+      opacity: 0.6;
+      margin-bottom: 0.25rem;
     }
 
     .stat-value {
-      font-size: 1.5rem;
-      font-weight: 600;
+      font-size: 0.9rem;
     }
 
     /* Bottom - Controls hint */
     #controls-hint {
       position: fixed;
-      bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.7rem;
+      bottom: 1.5rem;
+      left: 1.5rem;
+      font-size: 0.35rem;
       opacity: 0.4;
       text-transform: uppercase;
       letter-spacing: 0.1em;
+      background: rgba(245, 240, 230, 0.95);
+      padding: 0.75rem 1rem;
+      z-index: 10;
+    }
+
+    /* Bottom right - Ko-fi */
+    #kofi-link {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 4rem;
+      font-size: 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #1a1a1a;
+      text-decoration: none;
+      opacity: 0.5;
+      background: rgba(245, 240, 230, 0.95);
+      padding: 0.75rem 1rem;
+      z-index: 10;
+      transition: opacity 0.2s;
+    }
+
+    #kofi-link:hover {
+      opacity: 1;
     }
 
     /* Help button */
     #help-button {
       position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      width: 32px;
-      height: 32px;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
-      background: transparent;
+      background: rgba(245, 240, 230, 0.95);
       color: #1a1a1a;
       border: 1px solid rgba(26, 26, 26, 0.2);
-      font-size: 0.9rem;
+      font-size: 0.6rem;
       cursor: pointer;
       opacity: 0.5;
       transition: opacity 0.2s;
+      z-index: 10;
     }
 
     #help-button:hover { opacity: 1; }
@@ -149,11 +187,10 @@
     }
 
     #help-panel h2 {
-      font-size: 0.8rem;
+      font-size: 0.5rem;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.15em;
       margin-bottom: 1.5rem;
-      font-weight: 400;
     }
 
     #help-panel table {
@@ -162,8 +199,8 @@
     }
 
     #help-panel td {
-      padding: 0.4rem 0;
-      font-size: 0.85rem;
+      padding: 0.5rem 0;
+      font-size: 0.4rem;
     }
 
     #help-panel td:last-child {
@@ -178,7 +215,7 @@
       border: 1px solid rgba(245, 240, 230, 0.3);
       padding: 0.5rem 1rem;
       cursor: pointer;
-      font-size: 0.8rem;
+      font-size: 0.4rem;
       text-transform: uppercase;
       letter-spacing: 0.1em;
     }
@@ -204,17 +241,16 @@
 
     #pause-overlay h2 {
       color: #F5F0E6;
-      font-size: 1rem;
+      font-size: 0.6rem;
       text-transform: uppercase;
       letter-spacing: 0.2em;
-      font-weight: 400;
       margin-bottom: 1rem;
     }
 
     #pause-timer {
       color: #F5F0E6;
       opacity: 0.5;
-      font-size: 0.8rem;
+      font-size: 0.5rem;
       margin-bottom: 2rem;
     }
 
@@ -225,7 +261,7 @@
       padding: 0.75rem 2rem;
       margin: 0.25rem;
       cursor: pointer;
-      font-size: 0.8rem;
+      font-size: 0.4rem;
       text-transform: uppercase;
       letter-spacing: 0.1em;
     }
@@ -249,29 +285,27 @@
     }
 
     #game-over h2 {
-      font-size: 0.8rem;
+      font-size: 0.5rem;
       text-transform: uppercase;
       letter-spacing: 0.2em;
-      font-weight: 400;
       margin-bottom: 2rem;
       opacity: 0.5;
     }
 
     #final-score {
-      font-size: 3rem;
-      font-weight: 600;
+      font-size: 1.5rem;
       margin-bottom: 0.5rem;
     }
 
     #rank-position {
-      font-size: 0.9rem;
+      font-size: 0.5rem;
       opacity: 0.5;
       margin-bottom: 2rem;
     }
 
     #game-over input {
       font-family: inherit;
-      font-size: 1rem;
+      font-size: 0.5rem;
       padding: 0.75rem 1rem;
       border: 1px solid rgba(26, 26, 26, 0.2);
       background: transparent;
@@ -296,7 +330,7 @@
       border: 1px solid rgba(26, 26, 26, 0.2);
       padding: 0.75rem 1.5rem;
       cursor: pointer;
-      font-size: 0.8rem;
+      font-size: 0.4rem;
       text-transform: uppercase;
       letter-spacing: 0.1em;
     }
@@ -321,10 +355,9 @@
     }
 
     #ranking-view h2 {
-      font-size: 0.8rem;
+      font-size: 0.5rem;
       text-transform: uppercase;
       letter-spacing: 0.2em;
-      font-weight: 400;
       margin-bottom: 2rem;
       opacity: 0.5;
     }
@@ -340,7 +373,7 @@
       border: 1px solid rgba(26, 26, 26, 0.2);
       padding: 0.5rem 1rem;
       cursor: pointer;
-      font-size: 0.75rem;
+      font-size: 0.35rem;
       text-transform: uppercase;
       letter-spacing: 0.1em;
     }
@@ -363,11 +396,7 @@
       justify-content: space-between;
       padding: 0.75rem 0;
       border-bottom: 1px solid rgba(26, 26, 26, 0.1);
-      font-size: 0.9rem;
-    }
-
-    .ranking-entry span:last-child {
-      font-weight: 600;
+      font-size: 0.4rem;
     }
 
     #back-button {
@@ -377,7 +406,7 @@
       border: 1px solid rgba(26, 26, 26, 0.2);
       padding: 0.75rem 2rem;
       cursor: pointer;
-      font-size: 0.8rem;
+      font-size: 0.4rem;
       text-transform: uppercase;
       letter-spacing: 0.1em;
     }
@@ -403,7 +432,7 @@
     <!-- Next piece -->
     <div id="next-piece-container">
       <span>Next</span>
-      <canvas id="next-piece-canvas" width="100" height="100" aria-label="Next piece preview"></canvas>
+      <canvas id="next-piece-canvas" width="120" height="120" aria-label="Next piece preview"></canvas>
     </div>
 
     <!-- Stats -->
@@ -423,10 +452,13 @@
     </div>
 
     <!-- Controls hint -->
-    <div id="controls-hint">Arrows · Q/E R/F · Space · Mouse</div>
+    <div id="controls-hint">Arrows · Q/E R/F · Space · Mouse · Scroll to zoom</div>
 
     <!-- Help button -->
     <button id="help-button" aria-label="Show controls help">?</button>
+
+    <!-- Ko-fi link -->
+    <a id="kofi-link" href="https://ko-fi.com/shiaradesign" target="_blank" rel="noopener noreferrer">Buy me a coffee ♥</a>
   </div>
 
   <!-- Help Panel -->
@@ -438,6 +470,7 @@
       <tr><td>Rotate V</td><td>R / F</td></tr>
       <tr><td>Drop</td><td>Space</td></tr>
       <tr><td>Camera</td><td>Mouse drag</td></tr>
+      <tr><td>Zoom</td><td>Scroll</td></tr>
       <tr><td>Snap</td><td>X / Y / Z</td></tr>
       <tr><td>Pause</td><td>Esc</td></tr>
     </table>
