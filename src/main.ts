@@ -134,6 +134,12 @@ class Game {
     // Update game state
     this.engine.update(deltaTime);
 
+    // Check for cleared planes and show flash effect
+    const clearedPlanes = this.engine.getClearedPlanes();
+    clearedPlanes.forEach((planeY) => {
+      this.renderer.showFlashEffect(planeY);
+    });
+
     // Update UI
     this.uiManager.updateGameStats(state);
 

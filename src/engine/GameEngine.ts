@@ -21,6 +21,7 @@ export class GameEngine {
   private state: GameState;
   private lastFallTime: number = 0;
   private dropStartY: number = 0;
+  private recentlyClearedPlanes: number[] = [];
 
   constructor() {
     this.state = this.createInitialState();
@@ -258,6 +259,9 @@ export class GameEngine {
     // Check for complete planes
     const clearedPlanes = this.checkAndClearPlanes();
 
+    // Store for flash effect
+    this.recentlyClearedPlanes = clearedPlanes;
+
     // Calculate total score
     if (clearedPlanes.length > 0) {
       this.state.combo += 1;
@@ -337,9 +341,9 @@ export class GameEngine {
   }
 
   public getClearedPlanes(): number[] {
-    // This method is called by the renderer to show flash effects
-    // For now, we'll track this in the update cycle
-    return [];
+    const planes = this.recentlyClearedPlanes;
+    this.recentlyClearedPlanes = [];
+    return planes;
   }
 
   public togglePause(): void {
