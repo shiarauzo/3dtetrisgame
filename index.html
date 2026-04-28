@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stakk - 3D Tetris</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #FFD700;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      overflow: hidden;
+    }
+
+    #app {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Landing */
+    #landing {
+      text-align: center;
+    }
+
+    #landing h1 {
+      font-size: 4rem;
+      font-weight: 900;
+      color: #000;
+      margin-bottom: 2rem;
+    }
+
+    #landing button {
+      font-size: 1.5rem;
+      padding: 1rem 2rem;
+      background: #000;
+      color: #FFD700;
+      border: 3px solid #000;
+      cursor: pointer;
+      font-weight: 700;
+      margin-bottom: 2rem;
+    }
+
+    #landing button:hover {
+      background: #FFD700;
+      color: #000;
+      border: 3px solid #000;
+    }
+
+    #ranking-preview {
+      max-width: 400px;
+      margin: 0 auto;
+      background: rgba(0, 0, 0, 0.1);
+      padding: 1rem;
+    }
+
+    #ranking-preview h3 {
+      margin-bottom: 1rem;
+    }
+
+    .ranking-entry {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    }
+
+    /* Game View */
+    #game-view {
+      width: 100vw;
+      height: 100vh;
+      display: grid;
+      grid-template-columns: 200px 1fr 200px;
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+    #left-panel, #right-panel {
+      background: rgba(0, 0, 0, 0.1);
+      padding: 1rem;
+    }
+
+    .panel-section {
+      margin-bottom: 2rem;
+    }
+
+    .panel-section h3 {
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+
+    #next-piece-canvas {
+      width: 150px;
+      height: 150px;
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    #score, #level, #combo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #000;
+    }
+
+    #game-canvas-container {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #game-canvas {
+      display: block;
+    }
+
+    #help-button {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #000;
+      color: #FFD700;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    #help-button:hover {
+      background: #333;
+    }
+
+    /* Help Panel */
+    #help-panel {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #000;
+      color: #FFD700;
+      padding: 2rem;
+      max-width: 500px;
+      z-index: 1000;
+    }
+
+    #help-panel h2 {
+      margin-bottom: 1rem;
+    }
+
+    #help-panel table {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+
+    #help-panel td {
+      padding: 0.5rem;
+      border-bottom: 1px solid #FFD700;
+    }
+
+    #help-panel button {
+      background: #FFD700;
+      color: #000;
+      border: none;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    /* Pause Overlay */
+    #pause-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    #pause-overlay h2 {
+      color: #FFD700;
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    #pause-timer {
+      color: #FFD700;
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    #pause-overlay button {
+      background: #FFD700;
+      color: #000;
+      border: none;
+      padding: 1rem 2rem;
+      margin: 0.5rem;
+      cursor: pointer;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    /* Game Over */
+    #game-over {
+      text-align: center;
+    }
+
+    #game-over h2 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    #game-over p {
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    #game-over input {
+      font-size: 1.2rem;
+      padding: 0.5rem 1rem;
+      margin-bottom: 1rem;
+      border: 2px solid #000;
+      background: #fff;
+      width: 300px;
+    }
+
+    #game-over button {
+      background: #000;
+      color: #FFD700;
+      border: none;
+      padding: 1rem 2rem;
+      margin: 0.5rem;
+      cursor: pointer;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    #game-over button:hover {
+      background: #333;
+    }
+
+    /* Ranking View */
+    #ranking-view {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    #ranking-view h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .filter-tabs button {
+      background: rgba(0, 0, 0, 0.1);
+      border: 2px solid #000;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .filter-tabs button.active {
+      background: #000;
+      color: #FFD700;
+    }
+
+    #ranking-list {
+      background: rgba(0, 0, 0, 0.1);
+      padding: 1rem;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+
+    #back-button {
+      margin-top: 1rem;
+      background: #000;
+      color: #FFD700;
+      border: none;
+      padding: 1rem 2rem;
+      cursor: pointer;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- Landing Page -->
+    <div id="landing">
+      <h1>STAKK</h1>
+      <button id="play-button">Click to play</button>
+      <div id="ranking-preview">
+        <h3>Top 5</h3>
+        <div id="top-5-list"></div>
+      </div>
+    </div>
+
+    <!-- Game View -->
+    <div id="game-view" class="hidden">
+      <div id="left-panel">
+        <div class="panel-section">
+          <h3>Next Piece</h3>
+          <canvas id="next-piece-canvas"></canvas>
+        </div>
+      </div>
+
+      <div id="game-canvas-container">
+        <canvas id="game-canvas"></canvas>
+        <button id="help-button">?</button>
+      </div>
+
+      <div id="right-panel">
+        <div class="panel-section">
+          <h3>Score</h3>
+          <div id="score">0</div>
+        </div>
+        <div class="panel-section">
+          <h3>Level</h3>
+          <div id="level">1</div>
+        </div>
+        <div class="panel-section">
+          <h3>Combo</h3>
+          <div id="combo">0</div>
+        </div>
+        <div class="panel-section">
+          <h3>Top 5</h3>
+          <div id="game-top-5"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Help Panel -->
+    <div id="help-panel" class="hidden">
+      <h2>Controls</h2>
+      <table>
+        <tr><td>Move piece</td><td>Arrow keys</td></tr>
+        <tr><td>Rotate horizontal</td><td>Q / E</td></tr>
+        <tr><td>Rotate vertical</td><td>R / F</td></tr>
+        <tr><td>Hard drop</td><td>Space</td></tr>
+        <tr><td>Rotate camera</td><td>Mouse drag</td></tr>
+        <tr><td>Snap camera X</td><td>X</td></tr>
+        <tr><td>Snap camera Y</td><td>Y</td></tr>
+        <tr><td>Snap camera Z</td><td>Z</td></tr>
+        <tr><td>Pause</td><td>ESC</td></tr>
+      </table>
+      <button id="close-help">Close</button>
+    </div>
+
+    <!-- Pause Overlay -->
+    <div id="pause-overlay" class="hidden">
+      <h2>Paused</h2>
+      <div id="pause-timer"></div>
+      <button id="continue-button">Continue</button>
+      <button id="exit-button">Exit</button>
+    </div>
+
+    <!-- Game Over -->
+    <div id="game-over" class="hidden">
+      <h2>Game Over</h2>
+      <p id="final-score">Score: 0</p>
+      <p id="rank-position"></p>
+      <input type="text" id="nickname-input" placeholder="Enter nickname" maxlength="20">
+      <div>
+        <button id="submit-score">Submit Score</button>
+        <button id="play-again">Play Again</button>
+        <button id="view-ranking">View Ranking</button>
+      </div>
+    </div>
+
+    <!-- Ranking View -->
+    <div id="ranking-view" class="hidden">
+      <h2>Rankings</h2>
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="global">Global</button>
+        <button class="filter-tab" data-filter="daily">Daily</button>
+        <button class="filter-tab" data-filter="weekly">Weekly</button>
+      </div>
+      <div id="ranking-list"></div>
+      <button id="back-button">Back to Menu</button>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
