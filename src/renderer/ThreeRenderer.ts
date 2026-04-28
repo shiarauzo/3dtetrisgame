@@ -27,6 +27,7 @@ export class ThreeRenderer {
   private zoomLevel = 1;
   private readonly MIN_ZOOM = 0.5;
   private readonly MAX_ZOOM = 2;
+  private cameraTheta = Math.PI / 4; // Current horizontal angle
 
   constructor(canvas: HTMLCanvasElement, nextPieceCanvas: HTMLCanvasElement) {
     // Check for reduced motion preference
@@ -214,12 +215,39 @@ export class ThreeRenderer {
     theta -= deltaX * sensitivity;
     phi = Math.max(0.1, Math.min(Math.PI - 0.1, phi - deltaY * sensitivity));
 
+    // Store theta for camera-relative controls
+    this.cameraTheta = theta;
+
     // Convert back to cartesian
     this.camera.position.x = radius * Math.sin(phi) * Math.cos(theta) + GRID_WIDTH / 2;
     this.camera.position.y = radius * Math.cos(phi) + GRID_HEIGHT / 2;
     this.camera.position.z = radius * Math.sin(phi) * Math.sin(theta) + GRID_DEPTH / 2;
 
     this.camera.lookAt(GRID_WIDTH / 2, GRID_HEIGHT / 2, GRID_DEPTH / 2);
+  }
+
+  public getCameraRelativeDirection(input: 'up' | 'down' | 'left' | 'right'): 'left' | 'right' | 'forward' | 'backward' {
+    // Normalize theta to 0-2PI
+    let angle = this.cameraTheta % (2 * Math.PI);
+    if (angle < 0) angle += 2 * Math.PI;
+
+    // Determine which quadrant the camera is in (8 directions for smoother control)
+    // Each sector is 45 degrees (PI/4)
+    const sector = Math.floor((angle + Math.PI / 8) / (Math.PI / 4)) % 8;
+
+    // Map input to world direction based on camera sector
+    const mappings: Record<number, Record<string, 'left' | 'right' | 'forward' | 'backward'>> = {
+      0: { up: 'forward', down: 'backward', left: 'left', right: 'right' },
+      1: { up: 'left', down: 'right', left: 'forward', right: 'backward' },
+      2: { up: 'left', down: 'right', left: 'forward', right: 'backward' },
+      3: { up: 'backward', down: 'forward', left: 'left', right: 'right' },
+      4: { up: 'backward', down: 'forward', left: 'right', right: 'left' },
+      5: { up: 'right', down: 'left', left: 'backward', right: 'forward' },
+      6: { up: 'right', down: 'left', left: 'backward', right: 'forward' },
+      7: { up: 'forward', down: 'backward', left: 'left', right: 'right' },
+    };
+
+    return mappings[sector][input];
   }
 
   public zoom(delta: number): void {
@@ -247,12 +275,15 @@ export class ThreeRenderer {
     switch (axis) {
       case 'x':
         this.camera.position.set(centerX + distance, centerY, centerZ);
+        this.cameraTheta = 0;
         break;
       case 'y':
         this.camera.position.set(centerX, centerY + distance, centerZ);
+        // Keep current theta for top-down view
         break;
       case 'z':
         this.camera.position.set(centerX, centerY, centerZ + distance);
+        this.cameraTheta = Math.PI / 2;
         break;
     }
 

@@ -29,19 +29,19 @@ export class InputHandler {
       switch (e.key) {
         case 'ArrowLeft':
           e.preventDefault();
-          this.engine.movePiece('left');
+          this.engine.movePiece(this.renderer.getCameraRelativeDirection('left'));
           break;
         case 'ArrowRight':
           e.preventDefault();
-          this.engine.movePiece('right');
+          this.engine.movePiece(this.renderer.getCameraRelativeDirection('right'));
           break;
         case 'ArrowUp':
           e.preventDefault();
-          this.engine.movePiece('forward');
+          this.engine.movePiece(this.renderer.getCameraRelativeDirection('up'));
           break;
         case 'ArrowDown':
           e.preventDefault();
-          this.engine.movePiece('backward');
+          this.engine.movePiece(this.renderer.getCameraRelativeDirection('down'));
           break;
         case 'q':
         case 'Q':
