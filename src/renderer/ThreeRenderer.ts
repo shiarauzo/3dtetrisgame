@@ -24,6 +24,9 @@ export class ThreeRenderer {
   private nextPieceCamera: THREE.OrthographicCamera;
   private flashPlanes: THREE.Mesh[] = [];
   private prefersReducedMotion: boolean;
+  private zoomLevel = 1;
+  private readonly MIN_ZOOM = 0.5;
+  private readonly MAX_ZOOM = 2;
 
   constructor(canvas: HTMLCanvasElement, nextPieceCanvas: HTMLCanvasElement) {
     // Check for reduced motion preference
@@ -217,6 +220,22 @@ export class ThreeRenderer {
     this.camera.position.z = radius * Math.sin(phi) * Math.sin(theta) + GRID_DEPTH / 2;
 
     this.camera.lookAt(GRID_WIDTH / 2, GRID_HEIGHT / 2, GRID_DEPTH / 2);
+  }
+
+  public zoom(delta: number): void {
+    const zoomSpeed = 0.1;
+    this.zoomLevel = Math.max(this.MIN_ZOOM, Math.min(this.MAX_ZOOM, this.zoomLevel + delta * zoomSpeed));
+    this.updateCameraZoom();
+  }
+
+  private updateCameraZoom(): void {
+    const aspect = this.renderer.domElement.width / this.renderer.domElement.height;
+    const frustumSize = 15 / this.zoomLevel;
+    this.camera.left = (frustumSize * aspect) / -2;
+    this.camera.right = (frustumSize * aspect) / 2;
+    this.camera.top = frustumSize / 2;
+    this.camera.bottom = frustumSize / -2;
+    this.camera.updateProjectionMatrix();
   }
 
   public snapCameraToAxis(axis: 'x' | 'y' | 'z'): void {

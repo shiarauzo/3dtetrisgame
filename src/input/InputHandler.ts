@@ -118,6 +118,13 @@ export class InputHandler {
     canvas.addEventListener('mouseleave', () => {
       this.isDragging = false;
     });
+
+    // Zoom with mouse wheel
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomDelta = e.deltaY > 0 ? 1 : -1;
+      this.renderer.zoom(zoomDelta);
+    }, { passive: false });
   }
 
   public onPause(callback: () => void): void {
