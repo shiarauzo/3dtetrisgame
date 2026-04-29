@@ -19,13 +19,14 @@ class Game {
     // Get canvas elements
     this.canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
     const nextPieceCanvas = document.getElementById('next-piece-canvas') as HTMLCanvasElement;
+    const axisGizmoCanvas = document.getElementById('axis-gizmo') as HTMLCanvasElement;
 
     // Set canvas to fullscreen
     this.resizeCanvas();
 
     // Initialize systems
     this.engine = new GameEngine();
-    this.renderer = new ThreeRenderer(this.canvas, nextPieceCanvas);
+    this.renderer = new ThreeRenderer(this.canvas, nextPieceCanvas, axisGizmoCanvas);
     this.inputHandler = new InputHandler(this.engine, this.renderer, this.canvas);
     this.uiManager = new UIManager();
     this.apiClient = new APIClient();
@@ -132,7 +133,9 @@ class Game {
 
     // Render with smooth falling
     const visualYOffset = this.engine.getVisualYOffset();
+    const dropY = this.engine.getDropY();
     this.renderer.renderPlacedBlocks(state.placedBlocks);
+    this.renderer.renderGhostPiece(state.currentPiece, dropY);
     this.renderer.renderCurrentPiece(state.currentPiece, visualYOffset);
     this.renderer.renderNextPiece(state.nextPiece);
     this.renderer.render();

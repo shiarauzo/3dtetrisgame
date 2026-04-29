@@ -36,6 +36,8 @@ export class ThreeRenderer {
   private sharedEdgeMaterial: THREE.LineBasicMaterial;
   private sharedFlashGeometry: THREE.PlaneGeometry;
   private sharedFlashMaterial: THREE.MeshBasicMaterial;
+  private sharedGhostMaterial: THREE.MeshBasicMaterial;
+  private sharedGhostEdgeMaterial: THREE.LineBasicMaterial;
 
   // Object pools
   private blockPool: THREE.Mesh[] = [];
@@ -43,12 +45,19 @@ export class ThreeRenderer {
   private currentPieceBlocks: THREE.Mesh[] = [];
   private nextPieceBlocks: THREE.Mesh[] = [];
   private nextPiecePool: THREE.Mesh[] = [];
+  private ghostBlocks: THREE.Mesh[] = [];
+  private ghostPool: THREE.Mesh[] = [];
+
+  // Axis gizmo
+  private axisGizmoRenderer: THREE.WebGLRenderer | null = null;
+  private axisGizmoScene: THREE.Scene | null = null;
+  private axisGizmoCamera: THREE.OrthographicCamera | null = null;
 
   // Flash plane (reused)
   private flashPlane: THREE.Mesh | null = null;
   private flashTimeout: number | null = null;
 
-  constructor(canvas: HTMLCanvasElement, nextPieceCanvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement, nextPieceCanvas: HTMLCanvasElement, axisGizmoCanvas?: HTMLCanvasElement) {
     this.prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // Create shared geometry and materials ONCE
@@ -61,6 +70,17 @@ export class ThreeRenderer {
       color: FLASH_COLOR,
       transparent: true,
       opacity: 0.7
+    });
+    // Ghost piece materials (semi-transparent gray)
+    this.sharedGhostMaterial = new THREE.MeshBasicMaterial({
+      color: 0x888888,
+      transparent: true,
+      opacity: 0.25
+    });
+    this.sharedGhostEdgeMaterial = new THREE.LineBasicMaterial({
+      color: 0x666666,
+      transparent: true,
+      opacity: 0.4
     });
 
     // Main scene setup
@@ -99,7 +119,7 @@ export class ThreeRenderer {
     this.nextPieceScene.background = new THREE.Color(BG_COLOR);
 
     const npAspect = nextPieceCanvas.width / nextPieceCanvas.height;
-    const npFrustumSize = 5;
+    const npFrustumSize = 8;
     this.nextPieceCamera = new THREE.OrthographicCamera(
       (npFrustumSize * npAspect) / -2,
       (npFrustumSize * npAspect) / 2,
@@ -108,8 +128,8 @@ export class ThreeRenderer {
       0.1,
       100
     );
-    this.nextPieceCamera.position.set(5, 5, 5);
-    this.nextPieceCamera.lookAt(2, 0, 2);
+    this.nextPieceCamera.position.set(5, 4, 5);
+    this.nextPieceCamera.lookAt(0.5, 0, 0.5);
 
     this.nextPieceRenderer = new THREE.WebGLRenderer({ canvas: nextPieceCanvas, antialias: true });
     this.nextPieceRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -118,11 +138,71 @@ export class ThreeRenderer {
     const npLight = new THREE.AmbientLight(0xffffff, 1);
     this.nextPieceScene.add(npLight);
 
+    // Axis gizmo setup
+    if (axisGizmoCanvas) {
+      this.setupAxisGizmo(axisGizmoCanvas);
+    }
+
     // Create grid
     this.createGrid();
 
     // Pre-allocate block pools
     this.initBlockPools();
+  }
+
+  private setupAxisGizmo(canvas: HTMLCanvasElement): void {
+    this.axisGizmoScene = new THREE.Scene();
+
+    const size = 2;
+    this.axisGizmoCamera = new THREE.OrthographicCamera(-size, size, size, -size, 0.1, 100);
+    this.axisGizmoCamera.position.set(3, 3, 3);
+    this.axisGizmoCamera.lookAt(0, 0, 0);
+
+    this.axisGizmoRenderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    this.axisGizmoRenderer.setSize(50, 50);
+    this.axisGizmoRenderer.setClearColor(0x000000, 0);
+
+    // Create axis lines
+    const axisLength = 1.2;
+
+    // X axis (red)
+    const xGeom = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(axisLength, 0, 0)
+    ]);
+    const xLine = new THREE.Line(xGeom, new THREE.LineBasicMaterial({ color: 0xe74c3c, linewidth: 2 }));
+    this.axisGizmoScene.add(xLine);
+
+    // Y axis (green)
+    const yGeom = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, axisLength, 0)
+    ]);
+    const yLine = new THREE.Line(yGeom, new THREE.LineBasicMaterial({ color: 0x2ecc71, linewidth: 2 }));
+    this.axisGizmoScene.add(yLine);
+
+    // Z axis (blue)
+    const zGeom = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, 0, axisLength)
+    ]);
+    const zLine = new THREE.Line(zGeom, new THREE.LineBasicMaterial({ color: 0x3498db, linewidth: 2 }));
+    this.axisGizmoScene.add(zLine);
+
+    // Add axis labels
+    // We'll use small spheres at the end of each axis as indicators
+    const sphereGeom = new THREE.SphereGeometry(0.12, 8, 8);
+    const xSphere = new THREE.Mesh(sphereGeom, new THREE.MeshBasicMaterial({ color: 0xe74c3c }));
+    xSphere.position.set(axisLength, 0, 0);
+    this.axisGizmoScene.add(xSphere);
+
+    const ySphere = new THREE.Mesh(sphereGeom, new THREE.MeshBasicMaterial({ color: 0x2ecc71 }));
+    ySphere.position.set(0, axisLength, 0);
+    this.axisGizmoScene.add(ySphere);
+
+    const zSphere = new THREE.Mesh(sphereGeom, new THREE.MeshBasicMaterial({ color: 0x3498db }));
+    zSphere.position.set(0, 0, axisLength);
+    this.axisGizmoScene.add(zSphere);
   }
 
   private initBlockPools(): void {
@@ -134,6 +214,14 @@ export class ThreeRenderer {
       this.blockPool.push(mesh);
     }
 
+    // Ghost piece pool (only need 4)
+    for (let i = 0; i < 4; i++) {
+      const mesh = this.createGhostBlockMesh();
+      mesh.visible = false;
+      this.scene.add(mesh);
+      this.ghostPool.push(mesh);
+    }
+
     // Next piece pool (only need 4)
     for (let i = 0; i < 4; i++) {
       const mesh = this.createPooledBlockMesh();
@@ -141,6 +229,13 @@ export class ThreeRenderer {
       this.nextPieceScene.add(mesh);
       this.nextPiecePool.push(mesh);
     }
+  }
+
+  private createGhostBlockMesh(): THREE.Mesh {
+    const mesh = new THREE.Mesh(this.sharedBlockGeometry, this.sharedGhostMaterial);
+    const edgeLines = new THREE.LineSegments(this.sharedEdgeGeometry, this.sharedGhostEdgeMaterial);
+    mesh.add(edgeLines);
+    return mesh;
   }
 
   private createPooledBlockMesh(): THREE.Mesh {
@@ -244,6 +339,30 @@ export class ThreeRenderer {
       mesh.position.set(block.position.x + 0.5, block.position.y + 0.5, block.position.z + 0.5);
       mesh.visible = true;
       this.nextPieceBlocks.push(mesh);
+    }
+  }
+
+  public renderGhostPiece(piece: Piece | null, dropY: number): void {
+    // Hide all ghost blocks
+    for (const block of this.ghostPool) {
+      block.visible = false;
+    }
+    this.ghostBlocks = [];
+
+    if (!piece) return;
+
+    // Show and position ghost blocks at drop position
+    for (let i = 0; i < piece.blocks.length && i < this.ghostPool.length; i++) {
+      const block = piece.blocks[i];
+      const mesh = this.ghostPool[i];
+      const worldPos = {
+        x: piece.position.x + block.position.x,
+        y: dropY + block.position.y,
+        z: piece.position.z + block.position.z,
+      };
+      mesh.position.set(worldPos.x + 0.5, worldPos.y + 0.5, worldPos.z + 0.5);
+      mesh.visible = true;
+      this.ghostBlocks.push(mesh);
     }
   }
 
@@ -357,6 +476,17 @@ export class ThreeRenderer {
   public render(): void {
     this.renderer.render(this.scene, this.camera);
     this.nextPieceRenderer.render(this.nextPieceScene, this.nextPieceCamera);
+
+    // Render axis gizmo with synced camera rotation
+    if (this.axisGizmoRenderer && this.axisGizmoScene && this.axisGizmoCamera) {
+      // Copy main camera rotation to gizmo camera
+      const direction = new THREE.Vector3();
+      this.camera.getWorldDirection(direction);
+      const distance = 5;
+      this.axisGizmoCamera.position.copy(direction).multiplyScalar(-distance);
+      this.axisGizmoCamera.lookAt(0, 0, 0);
+      this.axisGizmoRenderer.render(this.axisGizmoScene, this.axisGizmoCamera);
+    }
   }
 
   public handleResize(width: number, height: number): void {
@@ -372,6 +502,8 @@ export class ThreeRenderer {
     this.sharedEdgeMaterial.dispose();
     this.sharedFlashGeometry.dispose();
     this.sharedFlashMaterial.dispose();
+    this.sharedGhostMaterial.dispose();
+    this.sharedGhostEdgeMaterial.dispose();
 
     if (this.gridLines) {
       this.gridLines.geometry.dispose();
@@ -380,5 +512,6 @@ export class ThreeRenderer {
 
     this.renderer.dispose();
     this.nextPieceRenderer.dispose();
+    this.axisGizmoRenderer?.dispose();
   }
 }
