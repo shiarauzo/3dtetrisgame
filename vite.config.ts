@@ -7,6 +7,19 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true,
+    sourcemap: false, // Disable in production for smaller bundle
+    minify: 'esbuild',
+    target: 'es2020',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          three: ['three'],
+        },
+      },
+    },
+  },
+  // Optimize deps
+  optimizeDeps: {
+    include: ['three'],
   },
 });
