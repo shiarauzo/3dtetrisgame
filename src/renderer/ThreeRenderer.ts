@@ -89,7 +89,7 @@ export class ThreeRenderer {
 
     // Set initial zoom so entire grid is visible and centered
     // Lower zoom = more zoomed out (larger frustum)
-    this.zoomLevel = 0.65;
+    this.zoomLevel = 0.45;
     this.updateCameraZoom();
 
     // Lighting
