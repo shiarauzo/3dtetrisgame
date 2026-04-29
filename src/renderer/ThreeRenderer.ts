@@ -69,7 +69,7 @@ export class ThreeRenderer {
 
     // Orthographic camera for isometric view
     const aspect = canvas.width / canvas.height;
-    const frustumSize = 15;
+    const frustumSize = 18;
     this.camera = new THREE.OrthographicCamera(
       (frustumSize * aspect) / -2,
       (frustumSize * aspect) / 2,
@@ -323,7 +323,7 @@ export class ThreeRenderer {
 
   private updateCameraZoom(): void {
     const aspect = this.renderer.domElement.width / this.renderer.domElement.height;
-    const frustumSize = 15 / this.zoomLevel;
+    const frustumSize = 18 / this.zoomLevel;
     this.camera.left = (frustumSize * aspect) / -2;
     this.camera.right = (frustumSize * aspect) / 2;
     this.camera.top = frustumSize / 2;
