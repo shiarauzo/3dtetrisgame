@@ -303,9 +303,10 @@ export class GameEngine {
       }
     }
 
-    // Clear the planes
+    // Clear the planes (sort descending so higher planes are cleared first)
     if (clearedPlanes.length > 0) {
-      clearedPlanes.forEach((planeY) => {
+      const sortedPlanes = [...clearedPlanes].sort((a, b) => b - a);
+      sortedPlanes.forEach((planeY) => {
         // Clear the plane
         for (let x = 0; x < GRID_WIDTH; x++) {
           for (let z = 0; z < GRID_DEPTH; z++) {

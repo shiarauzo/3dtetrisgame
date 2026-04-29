@@ -149,6 +149,12 @@ export class UIManager {
     this.renderRankingList(rankings, this.elements.rankingList);
   }
 
+  private escapeHtml(text: string): string {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
   private renderRankingList(rankings: RankingEntry[], container: HTMLElement): void {
     if (rankings.length === 0) {
       container.innerHTML = '<div class="ranking-entry"><span>No scores yet</span><span>—</span></div>';
@@ -158,7 +164,7 @@ export class UIManager {
       .map(
         (entry, index) => `
       <div class="ranking-entry">
-        <span>${index + 1}. ${entry.nickname}</span>
+        <span>${index + 1}. ${this.escapeHtml(entry.nickname)}</span>
         <span>${entry.score.toLocaleString()}</span>
       </div>
     `
