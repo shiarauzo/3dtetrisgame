@@ -236,15 +236,16 @@ export class ThreeRenderer {
     const sector = Math.floor((angle + Math.PI / 8) / (Math.PI / 4)) % 8;
 
     // Map input to world direction based on camera sector
+    // Swapped left/right to match visual expectation
     const mappings: Record<number, Record<string, 'left' | 'right' | 'forward' | 'backward'>> = {
-      0: { up: 'forward', down: 'backward', left: 'left', right: 'right' },
-      1: { up: 'left', down: 'right', left: 'forward', right: 'backward' },
-      2: { up: 'left', down: 'right', left: 'forward', right: 'backward' },
-      3: { up: 'backward', down: 'forward', left: 'left', right: 'right' },
-      4: { up: 'backward', down: 'forward', left: 'right', right: 'left' },
-      5: { up: 'right', down: 'left', left: 'backward', right: 'forward' },
-      6: { up: 'right', down: 'left', left: 'backward', right: 'forward' },
-      7: { up: 'forward', down: 'backward', left: 'left', right: 'right' },
+      0: { up: 'forward', down: 'backward', left: 'right', right: 'left' },
+      1: { up: 'left', down: 'right', left: 'backward', right: 'forward' },
+      2: { up: 'left', down: 'right', left: 'backward', right: 'forward' },
+      3: { up: 'backward', down: 'forward', left: 'right', right: 'left' },
+      4: { up: 'backward', down: 'forward', left: 'left', right: 'right' },
+      5: { up: 'right', down: 'left', left: 'forward', right: 'backward' },
+      6: { up: 'right', down: 'left', left: 'forward', right: 'backward' },
+      7: { up: 'forward', down: 'backward', left: 'right', right: 'left' },
     };
 
     return mappings[sector][input];
