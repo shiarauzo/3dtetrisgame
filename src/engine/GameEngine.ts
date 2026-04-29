@@ -22,6 +22,7 @@ export class GameEngine {
   private lastFallTime: number = 0;
   private dropStartY: number = 0;
   private recentlyClearedPlanes: number[] = [];
+  private visualYOffset: number = 0; // For smooth falling animation
 
   constructor() {
     this.state = this.createInitialState();
@@ -86,6 +87,8 @@ export class GameEngine {
     this.state.currentPiece = this.state.nextPiece;
     this.state.nextPiece = this.createPiece(getRandomTetrominoType());
     this.dropStartY = this.state.currentPiece.position.y;
+    this.visualYOffset = 0; // Reset visual offset for new piece
+    this.lastFallTime = 0;
 
     // Check if spawn position is blocked
     if (this.checkCollision(this.state.currentPiece, this.state.currentPiece.position)) {
@@ -100,10 +103,18 @@ export class GameEngine {
 
     this.lastFallTime += deltaTime;
 
+    // Calculate smooth visual offset (0 to 1, representing progress to next position)
+    this.visualYOffset = this.lastFallTime / this.state.fallSpeed;
+
     if (this.lastFallTime >= this.state.fallSpeed) {
       this.lastFallTime = 0;
+      this.visualYOffset = 0;
       this.moveDown();
     }
+  }
+
+  public getVisualYOffset(): number {
+    return this.visualYOffset;
   }
 
   private moveDown(): void {
@@ -197,6 +208,8 @@ export class GameEngine {
   public hardDrop(): void {
     if (!this.state.currentPiece) return;
 
+    this.visualYOffset = 0; // Reset for instant drop
+
     let dropDistance = 0;
     while (!this.checkCollision(this.state.currentPiece, {
       ...this.state.currentPiece.position,
@@ -243,18 +256,36 @@ export class GameEngine {
     const dropHeight = this.dropStartY - this.state.currentPiece.position.y;
     const dropScore = dropHeight * DROP_POINTS_MULTIPLIER;
 
-    // Add blocks to grid
+    // Add blocks to grid with bounds validation
     const newBlocks: Position[] = [];
     this.state.currentPiece.blocks.forEach((block) => {
       const worldX = this.state.currentPiece!.position.x + block.position.x;
       const worldY = this.state.currentPiece!.position.y + block.position.y;
       const worldZ = this.state.currentPiece!.position.z + block.position.z;
 
-      this.state.grid[worldX][worldY][worldZ] = true;
-      newBlocks.push({ x: worldX, y: worldY, z: worldZ });
+      // Validate bounds before placing
+      if (
+        worldX >= 0 && worldX < GRID_WIDTH &&
+        worldY >= 0 && worldY < GRID_HEIGHT &&
+        worldZ >= 0 && worldZ < GRID_DEPTH &&
+        !this.state.grid[worldX][worldY][worldZ] // Don't overwrite existing blocks
+      ) {
+        this.state.grid[worldX][worldY][worldZ] = true;
+        newBlocks.push({ x: worldX, y: worldY, z: worldZ });
+      }
     });
 
-    this.state.placedBlocks.push(...newBlocks);
+    // Rebuild placedBlocks from grid to ensure consistency
+    this.state.placedBlocks = [];
+    for (let x = 0; x < GRID_WIDTH; x++) {
+      for (let y = 0; y < GRID_HEIGHT; y++) {
+        for (let z = 0; z < GRID_DEPTH; z++) {
+          if (this.state.grid[x][y][z]) {
+            this.state.placedBlocks.push({ x, y, z });
+          }
+        }
+      }
+    }
 
     // Check for complete planes
     const clearedPlanes = this.checkAndClearPlanes();
@@ -303,9 +334,10 @@ export class GameEngine {
       }
     }
 
-    // Clear the planes
+    // Clear the planes (sort descending so higher planes are cleared first)
     if (clearedPlanes.length > 0) {
-      clearedPlanes.forEach((planeY) => {
+      const sortedPlanes = [...clearedPlanes].sort((a, b) => b - a);
+      sortedPlanes.forEach((planeY) => {
         // Clear the plane
         for (let x = 0; x < GRID_WIDTH; x++) {
           for (let z = 0; z < GRID_DEPTH; z++) {

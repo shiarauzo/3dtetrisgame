@@ -172,6 +172,17 @@
     #help-button:hover { opacity: 1; }
     #help-button:focus-visible { outline: 2px solid #1a1a1a; outline-offset: 2px; }
 
+    /* Help Backdrop */
+    #help-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(26, 26, 26, 0.8);
+      z-index: 999;
+    }
+
     /* Help Panel */
     #help-panel {
       position: fixed;
@@ -460,6 +471,9 @@
     <!-- Ko-fi link -->
     <a id="kofi-link" href="https://ko-fi.com/shiaradesign" target="_blank" rel="noopener noreferrer">Buy me a coffee ♥</a>
   </div>
+
+  <!-- Help Backdrop -->
+  <div id="help-backdrop" class="hidden"></div>
 
   <!-- Help Panel -->
   <div id="help-panel" class="hidden">

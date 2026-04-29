@@ -119,11 +119,20 @@ export class InputHandler {
       this.isDragging = false;
     });
 
-    // Zoom with mouse wheel
+    // Zoom with mouse wheel and trackpad pinch
     canvas.addEventListener('wheel', (e) => {
       e.preventDefault();
-      const zoomDelta = e.deltaY > 0 ? 1 : -1;
-      this.renderer.zoom(zoomDelta);
+
+      // Pinch gesture on trackpad (ctrlKey is true for pinch on macOS)
+      if (e.ctrlKey) {
+        // Pinch zoom - use deltaY directly for smooth zoom
+        const zoomDelta = e.deltaY * 0.5;
+        this.renderer.zoom(zoomDelta);
+      } else {
+        // Regular scroll wheel
+        const zoomDelta = e.deltaY > 0 ? 1 : -1;
+        this.renderer.zoom(zoomDelta);
+      }
     }, { passive: false });
   }
 

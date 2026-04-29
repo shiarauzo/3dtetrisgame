@@ -145,19 +145,19 @@ export class ThreeRenderer {
     });
   }
 
-  public renderCurrentPiece(piece: Piece | null): void {
+  public renderCurrentPiece(piece: Piece | null, visualYOffset: number = 0): void {
     // Remove old meshes
     this.currentPieceMeshes.forEach((mesh) => this.scene.remove(mesh));
     this.currentPieceMeshes = [];
 
     if (!piece) return;
 
-    // Add new meshes
+    // Add new meshes with smooth Y interpolation
     piece.blocks.forEach((block) => {
       const mesh = this.createBlockMesh();
       const worldPos = {
         x: piece.position.x + block.position.x,
-        y: piece.position.y + block.position.y,
+        y: piece.position.y + block.position.y - visualYOffset, // Smooth falling
         z: piece.position.z + block.position.z,
       };
       mesh.position.set(worldPos.x + 0.5, worldPos.y + 0.5, worldPos.z + 0.5);
@@ -236,15 +236,16 @@ export class ThreeRenderer {
     const sector = Math.floor((angle + Math.PI / 8) / (Math.PI / 4)) % 8;
 
     // Map input to world direction based on camera sector
+    // Swapped left/right to match visual expectation
     const mappings: Record<number, Record<string, 'left' | 'right' | 'forward' | 'backward'>> = {
-      0: { up: 'forward', down: 'backward', left: 'left', right: 'right' },
-      1: { up: 'left', down: 'right', left: 'forward', right: 'backward' },
-      2: { up: 'left', down: 'right', left: 'forward', right: 'backward' },
-      3: { up: 'backward', down: 'forward', left: 'left', right: 'right' },
-      4: { up: 'backward', down: 'forward', left: 'right', right: 'left' },
-      5: { up: 'right', down: 'left', left: 'backward', right: 'forward' },
-      6: { up: 'right', down: 'left', left: 'backward', right: 'forward' },
-      7: { up: 'forward', down: 'backward', left: 'left', right: 'right' },
+      0: { up: 'forward', down: 'backward', left: 'right', right: 'left' },
+      1: { up: 'left', down: 'right', left: 'backward', right: 'forward' },
+      2: { up: 'left', down: 'right', left: 'backward', right: 'forward' },
+      3: { up: 'backward', down: 'forward', left: 'right', right: 'left' },
+      4: { up: 'backward', down: 'forward', left: 'left', right: 'right' },
+      5: { up: 'right', down: 'left', left: 'forward', right: 'backward' },
+      6: { up: 'right', down: 'left', left: 'forward', right: 'backward' },
+      7: { up: 'forward', down: 'backward', left: 'right', right: 'left' },
     };
 
     return mappings[sector][input];
