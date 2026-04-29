@@ -236,6 +236,19 @@ export class GameEngine {
     this.placePiece();
   }
 
+  public getDropY(): number {
+    if (!this.state.currentPiece) return 0;
+
+    let testY = this.state.currentPiece.position.y;
+    while (!this.checkCollision(this.state.currentPiece, {
+      ...this.state.currentPiece.position,
+      y: testY - 1,
+    })) {
+      testY -= 1;
+    }
+    return testY;
+  }
+
   private checkCollision(piece: Piece, position: Position): boolean {
     for (const block of piece.blocks) {
       const worldX = position.x + block.position.x;

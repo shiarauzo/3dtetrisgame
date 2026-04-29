@@ -23,6 +23,12 @@ export class InputHandler {
 
   private setupKeyboardListeners(): void {
     document.addEventListener('keydown', (e) => {
+      // Ignore keyboard controls when typing in an input
+      const activeElement = document.activeElement;
+      if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
+        return;
+      }
+
       const state = this.engine.getState();
       if (state.isGameOver) return;
 
