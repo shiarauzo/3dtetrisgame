@@ -243,18 +243,36 @@ export class GameEngine {
     const dropHeight = this.dropStartY - this.state.currentPiece.position.y;
     const dropScore = dropHeight * DROP_POINTS_MULTIPLIER;
 
-    // Add blocks to grid
+    // Add blocks to grid with bounds validation
     const newBlocks: Position[] = [];
     this.state.currentPiece.blocks.forEach((block) => {
       const worldX = this.state.currentPiece!.position.x + block.position.x;
       const worldY = this.state.currentPiece!.position.y + block.position.y;
       const worldZ = this.state.currentPiece!.position.z + block.position.z;
 
-      this.state.grid[worldX][worldY][worldZ] = true;
-      newBlocks.push({ x: worldX, y: worldY, z: worldZ });
+      // Validate bounds before placing
+      if (
+        worldX >= 0 && worldX < GRID_WIDTH &&
+        worldY >= 0 && worldY < GRID_HEIGHT &&
+        worldZ >= 0 && worldZ < GRID_DEPTH &&
+        !this.state.grid[worldX][worldY][worldZ] // Don't overwrite existing blocks
+      ) {
+        this.state.grid[worldX][worldY][worldZ] = true;
+        newBlocks.push({ x: worldX, y: worldY, z: worldZ });
+      }
     });
 
-    this.state.placedBlocks.push(...newBlocks);
+    // Rebuild placedBlocks from grid to ensure consistency
+    this.state.placedBlocks = [];
+    for (let x = 0; x < GRID_WIDTH; x++) {
+      for (let y = 0; y < GRID_HEIGHT; y++) {
+        for (let z = 0; z < GRID_DEPTH; z++) {
+          if (this.state.grid[x][y][z]) {
+            this.state.placedBlocks.push({ x, y, z });
+          }
+        }
+      }
+    }
 
     // Check for complete planes
     const clearedPlanes = this.checkAndClearPlanes();
