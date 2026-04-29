@@ -87,10 +87,9 @@ export class ThreeRenderer {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setSize(canvas.width, canvas.height);
 
-    // Calculate responsive initial zoom based on viewport
-    const minDimension = Math.min(canvas.width, canvas.height);
-    // Smaller zoom so game fits well in viewport
-    this.zoomLevel = Math.max(this.MIN_ZOOM, Math.min(1.0, minDimension / 1500));
+    // Set initial zoom so entire grid is visible and centered
+    // Lower zoom = more zoomed out (larger frustum)
+    this.zoomLevel = 0.65;
     this.updateCameraZoom();
 
     // Lighting
@@ -367,10 +366,6 @@ export class ThreeRenderer {
   }
 
   public handleResize(width: number, height: number): void {
-    // Recalculate responsive zoom
-    const minDimension = Math.min(width, height);
-    this.zoomLevel = Math.max(this.MIN_ZOOM, Math.min(1.0, minDimension / 1500));
-
     this.renderer.setSize(width, height);
     this.updateCameraZoom();
   }
