@@ -7,18 +7,19 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: false, // Disable in production for smaller bundle
+    sourcemap: false,
     minify: 'esbuild',
     target: 'es2020',
     rollupOptions: {
       output: {
-        manualChunks: {
-          three: ['three'],
+        manualChunks(id) {
+          if (id.includes('node_modules/three')) {
+            return 'three';
+          }
         },
       },
     },
   },
-  // Optimize deps
   optimizeDeps: {
     include: ['three'],
   },
