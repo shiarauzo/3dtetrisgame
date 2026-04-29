@@ -89,8 +89,8 @@ export class ThreeRenderer {
 
     // Calculate responsive initial zoom based on viewport
     const minDimension = Math.min(canvas.width, canvas.height);
-    // Base zoom for 800px viewport, scale proportionally
-    this.zoomLevel = Math.max(this.MIN_ZOOM, Math.min(this.MAX_ZOOM, minDimension / 800));
+    // Smaller zoom so game fits well in viewport
+    this.zoomLevel = Math.max(this.MIN_ZOOM, Math.min(1.0, minDimension / 1500));
     this.updateCameraZoom();
 
     // Lighting
@@ -369,7 +369,7 @@ export class ThreeRenderer {
   public handleResize(width: number, height: number): void {
     // Recalculate responsive zoom
     const minDimension = Math.min(width, height);
-    this.zoomLevel = Math.max(this.MIN_ZOOM, Math.min(this.MAX_ZOOM, minDimension / 800));
+    this.zoomLevel = Math.max(this.MIN_ZOOM, Math.min(1.0, minDimension / 1500));
 
     this.renderer.setSize(width, height);
     this.updateCameraZoom();
