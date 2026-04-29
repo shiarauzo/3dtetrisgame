@@ -103,8 +103,20 @@ export class GameEngine {
 
     this.lastFallTime += deltaTime;
 
-    // Calculate smooth visual offset (0 to 1, representing progress to next position)
-    this.visualYOffset = this.lastFallTime / this.state.fallSpeed;
+    // Check if next position would cause collision
+    const nextPosition = {
+      ...this.state.currentPiece.position,
+      y: this.state.currentPiece.position.y - 1,
+    };
+    const willCollide = this.checkCollision(this.state.currentPiece, nextPosition);
+
+    // Only apply visual offset if there's no collision ahead
+    // This prevents visual overlap with placed blocks
+    if (willCollide) {
+      this.visualYOffset = 0;
+    } else {
+      this.visualYOffset = this.lastFallTime / this.state.fallSpeed;
+    }
 
     if (this.lastFallTime >= this.state.fallSpeed) {
       this.lastFallTime = 0;
