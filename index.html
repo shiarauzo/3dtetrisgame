@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional&text=0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz%20.,-:?" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -19,7 +19,7 @@
 
     body {
       background-color: #F5F0E6;
-      font-family: 'Press Start 2P', 'Courier New', monospace;
+      font-family: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
       overflow: hidden;
       color: #1a1a1a;
     }
@@ -68,17 +68,17 @@
       top: 1.5rem;
       left: 1.5rem;
       background: rgba(245, 240, 230, 0.95);
-      padding: 1rem;
+      padding: 0.75rem;
       z-index: 10;
     }
 
     #next-piece-container span {
       display: block;
-      font-size: 0.7rem;
+      font-size: 0.6rem;
       text-transform: uppercase;
-      letter-spacing: 0.15em;
-      opacity: 0.6;
-      margin-bottom: 0.75rem;
+      letter-spacing: 0.05em;
+      opacity: 0.5;
+      margin-bottom: 0.5rem;
     }
 
     #next-piece-canvas {
@@ -86,35 +86,45 @@
       display: block;
     }
 
-    /* Top right - Stats */
+    /* Bottom right - Stats */
     #stats-container {
       position: fixed;
-      top: 1.5rem;
+      bottom: 1.5rem;
       right: 1.5rem;
-      text-align: right;
+      display: flex;
+      gap: 2rem;
       background: rgba(245, 240, 230, 0.95);
-      padding: 1rem;
+      padding: 0.75rem 1rem;
       z-index: 10;
     }
 
-    .stat {
-      margin-bottom: 0.75rem;
+    /* Axis gizmo */
+    #axis-gizmo {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      width: 50px;
+      height: 50px;
+      z-index: 10;
+      pointer-events: none;
     }
 
-    .stat:last-child {
-      margin-bottom: 0;
+    .stat {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
     }
 
     .stat-label {
-      font-size: 0.6rem;
+      font-size: 0.65rem;
       text-transform: uppercase;
-      letter-spacing: 0.15em;
-      opacity: 0.6;
-      margin-bottom: 0.25rem;
+      letter-spacing: 0.05em;
+      opacity: 0.5;
     }
 
     .stat-value {
-      font-size: 1.2rem;
+      font-size: 0.85rem;
+      font-weight: 500;
     }
 
     /* Bottom - Controls hint */
@@ -122,13 +132,11 @@
       position: fixed;
       bottom: 1.5rem;
       left: 1.5rem;
-      font-size: 0.55rem;
-      opacity: 0.4;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      background: rgba(245, 240, 230, 0.95);
-      padding: 0.75rem 1rem;
+      font-size: 0.6rem;
+      opacity: 0.35;
+      letter-spacing: 0.02em;
       z-index: 10;
+      max-width: 260px;
     }
 
     /* Bottom center container */
@@ -139,42 +147,39 @@
       transform: translateX(-50%);
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 0.75rem;
       z-index: 10;
     }
 
     /* Ko-fi */
     #kofi-link {
-      font-size: 0.55rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
+      font-size: 0.6rem;
       color: #1a1a1a;
       text-decoration: none;
-      opacity: 0.5;
-      background: rgba(245, 240, 230, 0.95);
-      padding: 0.75rem 1rem;
-      transition: opacity 0.2s;
+      opacity: 0.35;
+      transition: opacity 0.15s;
     }
 
     #kofi-link:hover {
-      opacity: 1;
+      opacity: 0.8;
     }
 
     /* Help button */
     #help-button {
-      width: 36px;
-      height: 36px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
-      background: rgba(245, 240, 230, 0.95);
+      background: transparent;
       color: #1a1a1a;
-      border: 1px solid rgba(26, 26, 26, 0.2);
-      font-size: 0.8rem;
+      border: 1px solid rgba(26, 26, 26, 0.15);
+      font-family: inherit;
+      font-size: 0.7rem;
       cursor: pointer;
-      opacity: 0.5;
-      transition: opacity 0.2s;
+      opacity: 0.35;
+      transition: opacity 0.15s;
     }
 
-    #help-button:hover { opacity: 1; }
+    #help-button:hover { opacity: 0.8; }
     #help-button:focus-visible { outline: 2px solid #1a1a1a; outline-offset: 2px; }
 
     /* Help Backdrop */
@@ -203,10 +208,11 @@
     }
 
     #help-panel h2 {
-      font-size: 0.5rem;
+      font-size: 0.65rem;
       text-transform: uppercase;
-      letter-spacing: 0.15em;
-      margin-bottom: 1.5rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 1.25rem;
+      opacity: 0.7;
     }
 
     #help-panel table {
@@ -215,25 +221,24 @@
     }
 
     #help-panel td {
-      padding: 0.5rem 0;
-      font-size: 0.4rem;
+      padding: 0.4rem 0;
+      font-size: 0.7rem;
     }
 
     #help-panel td:last-child {
       text-align: right;
-      opacity: 0.6;
+      opacity: 0.5;
     }
 
     #help-panel button {
-      margin-top: 1.5rem;
+      margin-top: 1.25rem;
       background: transparent;
       color: #F5F0E6;
-      border: 1px solid rgba(245, 240, 230, 0.3);
-      padding: 0.5rem 1rem;
+      border: 1px solid rgba(245, 240, 230, 0.25);
+      padding: 0.5rem 1.25rem;
       cursor: pointer;
-      font-size: 0.4rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
+      font-family: inherit;
+      font-size: 0.7rem;
     }
 
     #help-panel button:hover { border-color: #F5F0E6; }
@@ -257,29 +262,29 @@
 
     #pause-overlay h2 {
       color: #F5F0E6;
-      font-size: 0.6rem;
+      font-size: 0.8rem;
       text-transform: uppercase;
-      letter-spacing: 0.2em;
-      margin-bottom: 1rem;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.75rem;
     }
 
     #pause-timer {
       color: #F5F0E6;
-      opacity: 0.5;
-      font-size: 0.5rem;
-      margin-bottom: 2rem;
+      opacity: 0.4;
+      font-size: 0.7rem;
+      margin-bottom: 1.5rem;
     }
 
     #pause-overlay button {
       background: transparent;
       color: #F5F0E6;
-      border: 1px solid rgba(245, 240, 230, 0.3);
-      padding: 0.75rem 2rem;
+      border: 1px solid rgba(245, 240, 230, 0.25);
+      padding: 0.6rem 1.5rem;
       margin: 0.25rem;
       cursor: pointer;
-      font-size: 0.4rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
+      font-family: inherit;
+      font-size: 0.7rem;
+      min-width: 100px;
     }
 
     #pause-overlay button:hover { border-color: #F5F0E6; }
@@ -301,33 +306,35 @@
     }
 
     #game-over h2 {
-      font-size: 0.5rem;
+      font-size: 0.7rem;
       text-transform: uppercase;
-      letter-spacing: 0.2em;
-      margin-bottom: 2rem;
-      opacity: 0.5;
+      letter-spacing: 0.1em;
+      margin-bottom: 1.5rem;
+      opacity: 0.4;
     }
 
     #final-score {
-      font-size: 1.5rem;
+      font-family: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+      font-size: 2.5rem;
+      font-weight: 400;
       margin-bottom: 0.5rem;
     }
 
     #rank-position {
-      font-size: 0.5rem;
-      opacity: 0.5;
-      margin-bottom: 2rem;
+      font-size: 0.7rem;
+      opacity: 0.4;
+      margin-bottom: 1.5rem;
     }
 
     #game-over input {
       font-family: inherit;
-      font-size: 0.5rem;
-      padding: 0.75rem 1rem;
-      border: 1px solid rgba(26, 26, 26, 0.2);
+      font-size: 0.75rem;
+      padding: 0.6rem 1rem;
+      border: 1px solid rgba(26, 26, 26, 0.15);
       background: transparent;
       text-align: center;
-      width: 200px;
-      margin-bottom: 1.5rem;
+      width: 180px;
+      margin-bottom: 1.25rem;
     }
 
     #game-over input:focus {
@@ -343,12 +350,12 @@
     #game-over button {
       background: transparent;
       color: #1a1a1a;
-      border: 1px solid rgba(26, 26, 26, 0.2);
-      padding: 0.75rem 1.5rem;
+      border: 1px solid rgba(26, 26, 26, 0.15);
+      padding: 0.6rem 1.25rem;
       cursor: pointer;
-      font-size: 0.4rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
+      font-family: inherit;
+      font-size: 0.7rem;
+      min-width: 90px;
     }
 
     #game-over button:hover { border-color: #1a1a1a; }
@@ -371,27 +378,26 @@
     }
 
     #ranking-view h2 {
-      font-size: 0.5rem;
+      font-size: 0.7rem;
       text-transform: uppercase;
-      letter-spacing: 0.2em;
-      margin-bottom: 2rem;
-      opacity: 0.5;
+      letter-spacing: 0.1em;
+      margin-bottom: 1.5rem;
+      opacity: 0.4;
     }
 
     .filter-tabs {
       display: flex;
       gap: 0.5rem;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
 
     .filter-tabs button {
       background: transparent;
-      border: 1px solid rgba(26, 26, 26, 0.2);
+      border: 1px solid rgba(26, 26, 26, 0.15);
       padding: 0.5rem 1rem;
       cursor: pointer;
-      font-size: 0.35rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
+      font-family: inherit;
+      font-size: 0.7rem;
     }
 
     .filter-tabs button.active {
@@ -404,27 +410,26 @@
 
     #ranking-list {
       width: 100%;
-      max-width: 400px;
+      max-width: 360px;
     }
 
     .ranking-entry {
       display: flex;
       justify-content: space-between;
-      padding: 0.75rem 0;
-      border-bottom: 1px solid rgba(26, 26, 26, 0.1);
-      font-size: 0.4rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid rgba(26, 26, 26, 0.08);
+      font-size: 0.7rem;
     }
 
     #back-button {
-      margin-top: 2rem;
+      margin-top: 1.5rem;
       background: transparent;
       color: #1a1a1a;
-      border: 1px solid rgba(26, 26, 26, 0.2);
-      padding: 0.75rem 2rem;
+      border: 1px solid rgba(26, 26, 26, 0.15);
+      padding: 0.6rem 1.5rem;
       cursor: pointer;
-      font-size: 0.4rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
+      font-family: inherit;
+      font-size: 0.7rem;
     }
 
     #back-button:hover { border-color: #1a1a1a; }
@@ -448,8 +453,11 @@
     <!-- Next piece -->
     <div id="next-piece-container">
       <span>Next</span>
-      <canvas id="next-piece-canvas" width="120" height="120" aria-label="Next piece preview"></canvas>
+      <canvas id="next-piece-canvas" width="80" height="80" aria-label="Next piece preview"></canvas>
     </div>
+
+    <!-- Axis Gizmo -->
+    <canvas id="axis-gizmo" width="50" height="50" aria-hidden="true"></canvas>
 
     <!-- Stats -->
     <div id="stats-container" role="status" aria-live="polite" aria-atomic="false">
@@ -468,11 +476,11 @@
     </div>
 
     <!-- Controls hint -->
-    <div id="controls-hint">Arrows · Q/E R/F · Space · Mouse · Scroll to zoom</div>
+    <div id="controls-hint">↑↓←→ move · QE RF rotate · Space drop</div>
 
     <!-- Bottom center: Ko-fi + Help -->
     <div id="bottom-center">
-      <a id="kofi-link" href="https://ko-fi.com/shiaradesign" target="_blank" rel="noopener noreferrer">Buy me a coffee ♥</a>
+      <a id="kofi-link" href="https://ko-fi.com/shiaradesign" target="_blank" rel="noopener noreferrer">☕ Support</a>
       <button id="help-button" aria-label="Show controls help">?</button>
     </div>
   </div>
