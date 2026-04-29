@@ -67,9 +67,9 @@ export class ThreeRenderer {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(BG_COLOR);
 
-    // Orthographic camera
+    // Orthographic camera for isometric view
     const aspect = canvas.width / canvas.height;
-    const frustumSize = 25;
+    const frustumSize = 15;
     this.camera = new THREE.OrthographicCamera(
       (frustumSize * aspect) / -2,
       (frustumSize * aspect) / 2,
@@ -82,14 +82,9 @@ export class ThreeRenderer {
     this.camera.position.set(CAMERA_DISTANCE, CAMERA_DISTANCE, CAMERA_DISTANCE);
     this.camera.lookAt(GRID_WIDTH / 2, GRID_HEIGHT / 2, GRID_DEPTH / 2);
 
-    // Renderer with pixel ratio cap for HiDPI
+    // Renderer setup
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setSize(canvas.width, canvas.height);
-
-    // Set initial zoom (1 = default, <1 = zoomed out, >1 = zoomed in)
-    this.zoomLevel = 1;
-    this.updateCameraZoom();
 
     // Lighting
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
@@ -328,7 +323,7 @@ export class ThreeRenderer {
 
   private updateCameraZoom(): void {
     const aspect = this.renderer.domElement.width / this.renderer.domElement.height;
-    const frustumSize = 25 / this.zoomLevel;
+    const frustumSize = 15 / this.zoomLevel;
     this.camera.left = (frustumSize * aspect) / -2;
     this.camera.right = (frustumSize * aspect) / 2;
     this.camera.top = frustumSize / 2;
