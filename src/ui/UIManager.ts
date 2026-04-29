@@ -5,6 +5,7 @@ export class UIManager {
   private elements = {
     gameView: document.getElementById('game-view')!,
     helpPanel: document.getElementById('help-panel')!,
+    helpBackdrop: document.getElementById('help-backdrop')!,
     pauseOverlay: document.getElementById('pause-overlay')!,
     gameOver: document.getElementById('game-over')!,
     rankingView: document.getElementById('ranking-view')!,
@@ -33,6 +34,7 @@ export class UIManager {
     onPlayAgain: null as (() => void) | null,
     onViewRanking: null as ((filter: RankingFilter) => void) | null,
     onBackToMenu: null as (() => void) | null,
+    onHelpToggle: null as ((isOpen: boolean) => void) | null,
   };
 
   private pauseStartTime = 0;
@@ -48,6 +50,10 @@ export class UIManager {
     });
 
     this.elements.closeHelp.addEventListener('click', () => {
+      this.toggleHelp();
+    });
+
+    this.elements.helpBackdrop.addEventListener('click', () => {
       this.toggleHelp();
     });
 
@@ -129,13 +135,26 @@ export class UIManager {
   }
 
   private toggleHelp(): void {
-    this.elements.helpPanel.classList.toggle('hidden');
+    const isHidden = this.elements.helpPanel.classList.contains('hidden');
+
+    if (isHidden) {
+      // Show help
+      this.elements.helpBackdrop.classList.remove('hidden');
+      this.elements.helpPanel.classList.remove('hidden');
+      if (this.callbacks.onHelpToggle) this.callbacks.onHelpToggle(true);
+    } else {
+      // Hide help
+      this.elements.helpBackdrop.classList.add('hidden');
+      this.elements.helpPanel.classList.add('hidden');
+      if (this.callbacks.onHelpToggle) this.callbacks.onHelpToggle(false);
+    }
   }
 
   private hideAll(): void {
     this.elements.gameOver.classList.add('hidden');
     this.elements.rankingView.classList.add('hidden');
     this.elements.helpPanel.classList.add('hidden');
+    this.elements.helpBackdrop.classList.add('hidden');
     this.hidePause();
   }
 
@@ -223,5 +242,9 @@ export class UIManager {
 
   public onBackToMenu(callback: () => void): void {
     this.callbacks.onBackToMenu = callback;
+  }
+
+  public onHelpToggle(callback: (isOpen: boolean) => void): void {
+    this.callbacks.onHelpToggle = callback;
   }
 }

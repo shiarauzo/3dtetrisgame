@@ -50,6 +50,7 @@ class Game {
     this.uiManager.onSubmitScore((nickname) => this.submitScore(nickname));
     this.uiManager.onViewRanking((filter) => this.viewRanking(filter));
     this.uiManager.onBackToMenu(() => this.startGame());
+    this.uiManager.onHelpToggle((isOpen) => this.engine.setPause(isOpen));
   }
 
   private startGame(): void {
