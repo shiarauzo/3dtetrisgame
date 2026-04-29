@@ -130,9 +130,10 @@ class Game {
     // Update UI
     this.uiManager.updateGameStats(state);
 
-    // Render
+    // Render with smooth falling
+    const visualYOffset = this.engine.getVisualYOffset();
     this.renderer.renderPlacedBlocks(state.placedBlocks);
-    this.renderer.renderCurrentPiece(state.currentPiece);
+    this.renderer.renderCurrentPiece(state.currentPiece, visualYOffset);
     this.renderer.renderNextPiece(state.nextPiece);
     this.renderer.render();
 

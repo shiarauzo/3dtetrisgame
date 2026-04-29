@@ -145,19 +145,19 @@ export class ThreeRenderer {
     });
   }
 
-  public renderCurrentPiece(piece: Piece | null): void {
+  public renderCurrentPiece(piece: Piece | null, visualYOffset: number = 0): void {
     // Remove old meshes
     this.currentPieceMeshes.forEach((mesh) => this.scene.remove(mesh));
     this.currentPieceMeshes = [];
 
     if (!piece) return;
 
-    // Add new meshes
+    // Add new meshes with smooth Y interpolation
     piece.blocks.forEach((block) => {
       const mesh = this.createBlockMesh();
       const worldPos = {
         x: piece.position.x + block.position.x,
-        y: piece.position.y + block.position.y,
+        y: piece.position.y + block.position.y - visualYOffset, // Smooth falling
         z: piece.position.z + block.position.z,
       };
       mesh.position.set(worldPos.x + 0.5, worldPos.y + 0.5, worldPos.z + 0.5);

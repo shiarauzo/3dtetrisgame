@@ -22,6 +22,7 @@ export class GameEngine {
   private lastFallTime: number = 0;
   private dropStartY: number = 0;
   private recentlyClearedPlanes: number[] = [];
+  private visualYOffset: number = 0; // For smooth falling animation
 
   constructor() {
     this.state = this.createInitialState();
@@ -86,6 +87,8 @@ export class GameEngine {
     this.state.currentPiece = this.state.nextPiece;
     this.state.nextPiece = this.createPiece(getRandomTetrominoType());
     this.dropStartY = this.state.currentPiece.position.y;
+    this.visualYOffset = 0; // Reset visual offset for new piece
+    this.lastFallTime = 0;
 
     // Check if spawn position is blocked
     if (this.checkCollision(this.state.currentPiece, this.state.currentPiece.position)) {
@@ -100,10 +103,18 @@ export class GameEngine {
 
     this.lastFallTime += deltaTime;
 
+    // Calculate smooth visual offset (0 to 1, representing progress to next position)
+    this.visualYOffset = this.lastFallTime / this.state.fallSpeed;
+
     if (this.lastFallTime >= this.state.fallSpeed) {
       this.lastFallTime = 0;
+      this.visualYOffset = 0;
       this.moveDown();
     }
+  }
+
+  public getVisualYOffset(): number {
+    return this.visualYOffset;
   }
 
   private moveDown(): void {
@@ -196,6 +207,8 @@ export class GameEngine {
 
   public hardDrop(): void {
     if (!this.state.currentPiece) return;
+
+    this.visualYOffset = 0; // Reset for instant drop
 
     let dropDistance = 0;
     while (!this.checkCollision(this.state.currentPiece, {
