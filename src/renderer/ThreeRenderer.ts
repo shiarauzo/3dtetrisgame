@@ -25,8 +25,8 @@ export class ThreeRenderer {
   private nextPieceCamera: THREE.OrthographicCamera;
   private prefersReducedMotion: boolean;
   private zoomLevel = 1;
-  private readonly MIN_ZOOM = 0.5;
-  private readonly MAX_ZOOM = 2;
+  private readonly MIN_ZOOM = 0.3;
+  private readonly MAX_ZOOM = 2.5;
   private cameraTheta = Math.PI / 4;
 
   // Shared geometry and materials (created ONCE)
@@ -86,6 +86,12 @@ export class ThreeRenderer {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setSize(canvas.width, canvas.height);
+
+    // Calculate responsive initial zoom based on viewport
+    const minDimension = Math.min(canvas.width, canvas.height);
+    // Base zoom for 800px viewport, scale proportionally
+    this.zoomLevel = Math.max(this.MIN_ZOOM, Math.min(this.MAX_ZOOM, minDimension / 800));
+    this.updateCameraZoom();
 
     // Lighting
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
@@ -361,14 +367,12 @@ export class ThreeRenderer {
   }
 
   public handleResize(width: number, height: number): void {
-    const aspect = width / height;
-    const frustumSize = 15;
-    this.camera.left = (frustumSize * aspect) / -2;
-    this.camera.right = (frustumSize * aspect) / 2;
-    this.camera.top = frustumSize / 2;
-    this.camera.bottom = frustumSize / -2;
-    this.camera.updateProjectionMatrix();
+    // Recalculate responsive zoom
+    const minDimension = Math.min(width, height);
+    this.zoomLevel = Math.max(this.MIN_ZOOM, Math.min(this.MAX_ZOOM, minDimension / 800));
+
     this.renderer.setSize(width, height);
+    this.updateCameraZoom();
   }
 
   public dispose(): void {

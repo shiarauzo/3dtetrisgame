@@ -124,13 +124,13 @@ export class InputHandler {
       e.preventDefault();
 
       // Pinch gesture on trackpad (ctrlKey is true for pinch on macOS)
+      // Inverted: negative deltaY = pinch out = zoom in
       if (e.ctrlKey) {
-        // Pinch zoom - use deltaY directly for smooth zoom
-        const zoomDelta = e.deltaY * 0.5;
+        const zoomDelta = -e.deltaY * 0.5;
         this.renderer.zoom(zoomDelta);
       } else {
-        // Regular scroll wheel
-        const zoomDelta = e.deltaY > 0 ? 1 : -1;
+        // Regular scroll wheel (inverted for natural feel)
+        const zoomDelta = e.deltaY > 0 ? -1 : 1;
         this.renderer.zoom(zoomDelta);
       }
     }, { passive: false });
