@@ -6,6 +6,7 @@
   <title>Stakk</title>
   <meta name="description" content="Stakk - A minimal 3D Tetris game">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional&text=0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz%20.,-:?" rel="stylesheet">
@@ -451,18 +452,18 @@
     </div>
 
     <!-- Stats -->
-    <div id="stats-container">
+    <div id="stats-container" role="status" aria-live="polite" aria-atomic="false">
       <div class="stat">
         <div class="stat-label">Score</div>
-        <div class="stat-value" id="score">0</div>
+        <div class="stat-value" id="score" aria-label="Score">0</div>
       </div>
       <div class="stat">
         <div class="stat-label">Level</div>
-        <div class="stat-value" id="level">1</div>
+        <div class="stat-value" id="level" aria-label="Level">1</div>
       </div>
       <div class="stat">
         <div class="stat-label">Combo</div>
-        <div class="stat-value" id="combo">0</div>
+        <div class="stat-value" id="combo" aria-label="Combo">0</div>
       </div>
     </div>
 
