@@ -11,6 +11,7 @@ Stakk is a web-based 3D Tetris game featuring:
 - Classic tetromino gameplay in a 5x5x15 3D grid
 - Horizontal plane clearing mechanics
 - Isometric camera with mouse rotation controls
+- **Hand gesture controls** using webcam and MediaPipe
 - Progressive difficulty with exponential speed curve
 - Global rankings with daily/weekly filters
 - No login required - just play
@@ -18,6 +19,8 @@ Stakk is a web-based 3D Tetris game featuring:
 ## How to Play
 
 ### Controls
+
+#### Keyboard & Mouse
 
 | Action | Keys |
 |--------|------|
@@ -29,7 +32,22 @@ Stakk is a web-based 3D Tetris game featuring:
 | Snap camera X axis | X |
 | Snap camera Y axis | Y |
 | Snap camera Z axis | Z |
+| Toggle gesture control | G |
 | Pause | ESC |
+
+#### Hand Gestures
+
+Press `G` or click the gesture button to enable webcam hand tracking.
+
+| Hand | Action |
+|------|--------|
+| Left hand | Move piece (position maps to 5x5 grid zones) |
+| Right hand | Rotate camera horizontally |
+| Closed fist (left) | Visual indicator (green=open, orange=closed) |
+
+The webcam preview shows both hands with different colors:
+- **Blue**: Left hand (piece control)
+- **Purple**: Right hand (camera control)
 
 ### Scoring
 
@@ -146,9 +164,13 @@ stakk/
 │   ├── renderer/          # Three.js rendering
 │   │   └── ThreeRenderer.ts
 │   ├── input/             # Input handling
-│   │   └── InputHandler.ts
+│   │   ├── InputHandler.ts
+│   │   ├── GestureController.ts  # Gesture system coordinator
+│   │   ├── GestureInterpreter.ts # Converts hand data to commands
+│   │   └── HandTracker.ts        # MediaPipe hand detection
 │   ├── ui/                # UI management
-│   │   └── UIManager.ts
+│   │   ├── UIManager.ts
+│   │   └── GestureOverlay.ts     # Webcam preview with hand visualization
 │   ├── api/               # API client
 │   │   └── client.ts
 │   ├── types.ts           # TypeScript types
