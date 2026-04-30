@@ -53,3 +53,40 @@ export interface RankingEntry {
 }
 
 export type RankingFilter = 'global' | 'daily' | 'weekly';
+
+// Gesture control types
+export interface HandLandmark {
+  x: number;
+  y: number;
+  z: number;
+}
+
+export type Handedness = 'Left' | 'Right';
+
+export interface HandData {
+  landmarks: HandLandmark[];
+  handedness: Handedness;
+  isGrabbing: boolean;
+}
+
+export interface DualHandState {
+  leftHand: HandData | null;
+  rightHand: HandData | null;
+}
+
+export interface GestureCommand {
+  type: 'move';
+  direction: 'left' | 'right' | 'forward' | 'backward';
+}
+
+export interface CameraRotationCommand {
+  type: 'rotate_camera';
+  deltaX: number;
+}
+
+export interface GestureState {
+  isActive: boolean;
+  handDetected: boolean;
+  currentZoneX: number;
+  currentZoneZ: number;
+}

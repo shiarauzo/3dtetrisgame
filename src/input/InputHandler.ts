@@ -8,6 +8,7 @@ export class InputHandler {
   private lastMouseX = 0;
   private lastMouseY = 0;
   private onPauseCallback: (() => void) | null = null;
+  private onGestureToggleCallback: (() => void) | null = null;
 
   constructor(
     engine: GameEngine,
@@ -94,6 +95,13 @@ export class InputHandler {
             this.onPauseCallback();
           }
           break;
+        case 'g':
+        case 'G':
+          e.preventDefault();
+          if (this.onGestureToggleCallback) {
+            this.onGestureToggleCallback();
+          }
+          break;
       }
     });
   }
@@ -144,5 +152,9 @@ export class InputHandler {
 
   public onPause(callback: () => void): void {
     this.onPauseCallback = callback;
+  }
+
+  public onGestureToggle(callback: () => void): void {
+    this.onGestureToggleCallback = callback;
   }
 }
