@@ -1,6 +1,7 @@
 import { GameEngine } from './engine/GameEngine';
 import { ThreeRenderer } from './renderer/ThreeRenderer';
 import { InputHandler } from './input/InputHandler';
+import { GestureController } from './input/GestureController';
 import { UIManager } from './ui/UIManager';
 import { APIClient } from './api/client';
 import { RankingFilter } from './types';
@@ -9,6 +10,7 @@ class Game {
   private engine: GameEngine;
   private renderer: ThreeRenderer;
   private inputHandler: InputHandler;
+  private gestureController: GestureController;
   private uiManager: UIManager;
   private apiClient: APIClient;
   private animationFrameId: number | null = null;
@@ -28,6 +30,7 @@ class Game {
     this.engine = new GameEngine();
     this.renderer = new ThreeRenderer(this.canvas, nextPieceCanvas, axisGizmoCanvas);
     this.inputHandler = new InputHandler(this.engine, this.renderer, this.canvas);
+    this.gestureController = new GestureController(this.engine, this.renderer);
     this.uiManager = new UIManager();
     this.apiClient = new APIClient();
 
@@ -36,6 +39,10 @@ class Game {
 
     // Setup input callbacks
     this.inputHandler.onPause(() => this.handlePause());
+    this.inputHandler.onGestureToggle(() => this.handleGestureToggle());
+
+    // Setup gesture button
+    this.setupGestureButton();
 
     // Handle window resize
     window.addEventListener('resize', () => this.handleResize());
@@ -155,6 +162,34 @@ class Game {
   private handleResize(): void {
     this.resizeCanvas();
     this.renderer.handleResize(this.canvas.width, this.canvas.height);
+  }
+
+  private async handleGestureToggle(): Promise<void> {
+    const state = this.engine.getState();
+    if (state.isGameOver || state.isPaused) return;
+
+    const isActive = await this.gestureController.toggle();
+    this.updateGestureButton(isActive);
+  }
+
+  private setupGestureButton(): void {
+    const gestureButton = document.getElementById('gesture-button');
+    if (gestureButton) {
+      gestureButton.addEventListener('click', () => this.handleGestureToggle());
+    }
+
+    // Update button when gesture state changes externally
+    this.gestureController.onToggle((isActive) => {
+      this.updateGestureButton(isActive);
+    });
+  }
+
+  private updateGestureButton(isActive: boolean): void {
+    const gestureButton = document.getElementById('gesture-button');
+    if (gestureButton) {
+      gestureButton.classList.toggle('active', isActive);
+      gestureButton.setAttribute('aria-pressed', String(isActive));
+    }
   }
 }
 

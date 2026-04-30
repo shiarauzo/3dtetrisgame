@@ -165,7 +165,8 @@
     }
 
     /* Help button */
-    #help-button {
+    #help-button,
+    #gesture-button {
       width: 28px;
       height: 28px;
       border-radius: 50%;
@@ -176,11 +177,19 @@
       font-size: 0.7rem;
       cursor: pointer;
       opacity: 0.35;
-      transition: opacity 0.15s;
+      transition: opacity 0.15s, background 0.15s;
     }
 
-    #help-button:hover { opacity: 0.8; }
-    #help-button:focus-visible { outline: 2px solid #1a1a1a; outline-offset: 2px; }
+    #help-button:hover,
+    #gesture-button:hover { opacity: 0.8; }
+    #help-button:focus-visible,
+    #gesture-button:focus-visible { outline: 2px solid #1a1a1a; outline-offset: 2px; }
+
+    #gesture-button.active {
+      background: #1a1a1a;
+      color: #F5F0E6;
+      opacity: 0.8;
+    }
 
     /* Help Backdrop */
     #help-backdrop {
@@ -476,11 +485,12 @@
     </div>
 
     <!-- Controls hint -->
-    <div id="controls-hint">↑↓←→ move · QE RF rotate · Space drop</div>
+    <div id="controls-hint">↑↓←→ move · QE RF rotate · Space drop · G gestures</div>
 
-    <!-- Bottom center: Ko-fi + Help -->
+    <!-- Bottom center: Ko-fi + Gesture + Help -->
     <div id="bottom-center">
       <a id="kofi-link" href="https://ko-fi.com/shiaradesign" target="_blank" rel="noopener noreferrer">☕ Support</a>
+      <button id="gesture-button" aria-label="Toggle hand gesture controls" aria-pressed="false" title="Hand gestures (G)">✋</button>
       <button id="help-button" aria-label="Show controls help">?</button>
     </div>
   </div>
@@ -499,6 +509,7 @@
       <tr><td>Camera</td><td>Mouse drag</td></tr>
       <tr><td>Zoom</td><td>Scroll</td></tr>
       <tr><td>Snap</td><td>X / Y / Z</td></tr>
+      <tr><td>Gestures</td><td>G</td></tr>
       <tr><td>Pause</td><td>Esc</td></tr>
     </table>
     <button id="close-help">Close</button>
